@@ -36,15 +36,6 @@ WorldRender.p.clear = function() {
   this.hex_render.clear();
 }
 
-WorldRender.p.drawWorld = function() {
-  
-  this.drawSome('lands')
-  this.drawSome('rivers');
-  this.drawSome('roads');
-  this.drawSome('units');
-  this.drawSome('resources');
-}
-
 
 
 WorldRender.p.drawBigHex = function(radius) {
@@ -83,7 +74,10 @@ WorldRender.p.drawBigHex = function(radius) {
 //Still look at all hexes, but there is a flag when they have been modified.
 //We only re-render if the flag has changed
 
-WorldRender.p.drawSome = function(tile_layer, count) {
+
+WorldRender.p.drawSome = function(tile_layer, attempts, draws) {
+
+  let hexes_drawn = 0;
   
   if (!this.landHexes)
     this.landHexes = [];
@@ -91,10 +85,10 @@ WorldRender.p.drawSome = function(tile_layer, count) {
   if (!this.landHexes[tile_layer])
     this.landHexes[tile_layer] = this.world.getHexes();
 
-  if (!count)
-    var count = this.world.tileCount();
+  if (!attempts)
+    var attempts = 100;
 
-  while (count) {
+  while (attempts && draws) {
     let next = this.landHexes[tile_layer].next()
 
     if (next.done) {
@@ -102,24 +96,28 @@ WorldRender.p.drawSome = function(tile_layer, count) {
       break;
     }
 
-    //if (world.getTile().hasChanged()) {
-      this.drawTile(tile_layer, next.value)
-      count--;
-    //}
+    if (this.drawTile(tile_layer, next.value)) {
+      hexes_drawn++
+      draws--; //draws measure the number of tiles actually drawn
+    }
+    attempts--; //attempts measure the number of tiles checked for changes
 
   }
+  if (hexes_drawn != 0)
+    console.log('drawn: '+hexes_drawn)
 }
 
 WorldRender.p.drawTile = function(tile_layer, hex) {
-
 
   //Only draw changed tiles
   let tile = this.world.getTile(hex);
   if (tile.changed)
     tile.changed = false;
   else {
-    return;
+    return false;
   }
+
+
 
   switch (tile_layer) {
     case 'tiles':
@@ -130,6 +128,8 @@ WorldRender.p.drawTile = function(tile_layer, hex) {
       this.drawResource(hex);
       break;
   }
+
+  return true;
 }
 
 

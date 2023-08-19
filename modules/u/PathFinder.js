@@ -263,16 +263,6 @@ export default function PathFinder(stepCostFunction, getNeighborFunction, stopFu
     while (!coords_to_check.isEmpty())
       checkNextCell(coords_to_check, map, max_cost, target)
     //callback();
-
-    //console.timeEnd('all')
-
-    if (coords_checked > 20){
-      console.log("checked: "+coords_checked)
-      console.log("visited: "+visited.size)
-
-
-    }
-    //console.timeEnd('rangeFind')
   };
 
   var coords_checked = 0;

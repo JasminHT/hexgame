@@ -37,30 +37,16 @@ export default function GameRender(system, worlds, world_inputs, view) {
 
   function draw() {
 
-    //clear the real canvas
     render.clear();
-
 
     //blit the temporary canvases to the final canvas
     for (let layer of layers) {
       layer.blit('canvas', view)
     }
 
-
     //draw the HUD on top
     for (let hud of hud_renders)
       hud.drawHUD();
-
-    //console.trace();
-
-
-    /* This used to decide which HUD to render 
-    //draw the HUD on top
-    if (view.getZoom() <= 0.08)
-      space_hud_render.drawHUD();
-    else
-      hud_render.drawHUD();
-     */
 
   }
 
@@ -73,13 +59,13 @@ export default function GameRender(system, worlds, world_inputs, view) {
 
       //if the required time hasnt elapsed yet, wait till next frame
       if (now-then < time) { 
-       window.requestAnimationFrame(step);
-       return;
+       //window.requestAnimationFrame(step);
+       //return;
       }
 
       callback();
 
-      now = then = new Date().getTime();
+      //now = then = new Date().getTime();
       window.requestAnimationFrame(step);
     }
     step();
@@ -87,13 +73,13 @@ export default function GameRender(system, worlds, world_inputs, view) {
 
   this.startDrawing = function() {
     loop(draw, 30);
-    loop(updateLayers, 30); 
+    loop(updateLayers, 60); 
   }
 
 
   Events.on('click', updateLayers);
   Events.on('canvas_resize', updateLayers);
-  updateLayers();
+  //updateLayers();
 }
 
 
@@ -171,9 +157,10 @@ LayerRender.prototype.blit = function(canvas_name, view) {
   render.blitCanvas(this.temp_canvas);
 }
 
-let draw_count = 500;
+var attempt_count = 500;
+var draw_count = 200;
 LayerRender.prototype.drawTiles = function() {
-  this.world_render.drawSome('tiles', draw_count);
+  this.world_render.drawSome('tiles', attempt_count, draw_count);
 }
 
 LayerRender.prototype.clear = function () {
