@@ -79,35 +79,28 @@ WorldRender.p.drawSome = function(tile_layer, attempts, draws) {
 
   let hexes_drawn = 0;
   
-  if (!this.landHexes)
-    this.landHexes = [];
-  
-  if (!this.landHexes[tile_layer])
-    this.landHexes[tile_layer] = this.world.getHexes();
-
   if (!attempts)
     var attempts = 100;
 
   while (attempts && draws) {
-    let next = this.landHexes[tile_layer].next()
 
-    if (next.done) {
-      this.landHexes[tile_layer] = this.world.getHexes();
+    if (this.world.getChangedHexes().length == 0) {
       break;
     }
+    let next = this.world.getChangedHexes().shift();
 
-    if (this.drawTile(tile_layer, next.value)) {
+
+    if (next instanceof Hex && this.drawTile(tile_layer, next)) {
       hexes_drawn++
       draws--; //draws measure the number of tiles actually drawn
     }
     attempts--; //attempts measure the number of tiles checked for changes
 
   }
-  if (hexes_drawn != 0)
-    console.log('drawn: '+hexes_drawn)
 }
 
 WorldRender.p.drawTile = function(tile_layer, hex) {
+
 
   //Only draw changed tiles
   let tile = this.world.getTile(hex);

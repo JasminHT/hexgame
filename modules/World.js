@@ -42,6 +42,7 @@ export default function World(radius, type, origin) {
   this.radius = radius;
   this.type = type;
   this.id = world_ids++;
+  this.tiles_changed = [];
 
   //configure world dimensions
   if (type == 'system') {
@@ -96,6 +97,7 @@ export default function World(radius, type, origin) {
     }
 
   }
+
 
 
 }
@@ -194,23 +196,34 @@ World.prototype.getUnit = function(hex) {
   return this.units.get(hex);
 }
 
+World.prototype.getChangedHexes = function() {
+
+  return this.tiles_changed;
+}
+
+World.prototype.tileChanged = function(hex) {
+  if (hex instanceof Hex) {
+    this.getTile(hex).changed = true;
+    this.tiles_changed.push(hex);
+  }
+}
 
 World.prototype.createUnit = function(hex, unit_type) {
 
-  this.getTile(hex).changed = true;
+    this.tileChanged(hex);
     let new_unit = new Unit(unit_type, this);
     this.units.set(hex, new_unit);
     return new_unit;
 }
 
 World.prototype.addUnit = function(hex, unit) {
-  this.getTile(hex).changed = true;
+  this.tileChanged(hex);
   unit.setWorld(this)
   this.units.set(hex, unit);
 }
 
 World.prototype.destroyUnit = function(hex) {
-  this.getTile(hex).changed = true;
+  this.tileChanged(hex);
     this.units.delete(hex);
 }
 
@@ -237,8 +250,9 @@ World.prototype.buildRoad = function(hexarray, road_level) {
 
 World.prototype.addRoadTile = function(hex1, hex2, road_level) {
 
-  this.getTile(hex1).changed = true;
-  this.getTile(hex2).changed = true;
+  this.tileChanged(hex1);
+  this.tileChanged(hex2);
+
 
   if (!road_level)
     road_level = 1;
@@ -308,7 +322,7 @@ World.prototype.biggestRoad = function(hex) {
 
 
 World.prototype.removeRoads = function(hex) {
-  this.getTile(hex).changed = true;
+  this.tileChanged(hex);
   this.getTile(hex).road_to = null;
 
 }
@@ -325,7 +339,7 @@ World.prototype.hasResource = function(hex, resource_type = 'food') {
 }
 
 World.prototype.destroyResource = function(hex) {
-  this.getTile(hex).changed = true;
+  this.tileChanged(hex);
   this.resources.delete(hex);
   if (this.getResource(hex))
     this.total_resources -= 1;
@@ -519,13 +533,13 @@ World.prototype.generateUnknown = function() {
 }
 
 World.prototype.addResource = function(hex, type) {
-  this.getTile(hex).changed = true;
+  this.tileChanged(hex);
   this.resources.set(hex, new Unit(type) );
   this.total_resources += 1;
 }
 
 World.prototype.addLocalResource = function(hex) {
-  this.getTile(hex).changed = true;
+  this.tileChanged(hex);
   let terrain = this.getTile(hex);
 
   if (terrain.river && terrain.river.water_level >= 7) {
@@ -559,7 +573,7 @@ World.prototype.addLocalResource = function(hex) {
 
 World.prototype.generateResources = function() {
   for (let hex of this.world_map.getHexes() )  {
-    this.getTile(hex).changed = true;
+
     
     //only 20% of the land gets resources
     if (Math.random() < 0.8) 
@@ -573,7 +587,7 @@ World.prototype.generateSystemResources = function() {
 
 
   for (let hex of this.world_map.getHexes() )  {
-    this.getTile(hex).changed = true;
+
     let terrain = this.getTile(hex);
     
     //only 20% of the land gets these resources
@@ -615,17 +629,17 @@ World.prototype.makeCloudsEverywhere = function() {
   for (let hex of this.world_map.getHexes()) {
       let tile = this.getTile(hex);
       tile.hidden = true;
-      tile.changed = true;
+          this.tileChanged(hex)
   }
 }
 
 World.prototype.clearClouds = function(position, radius) {
 
   if (!position) {
-    for (var hex of this.world_map.getHexes()) {
+    for (let hex of this.world_map.getHexes()) {
       let tile = this.getTile(hex);
       tile.hidden = false;
-      tile.changed = true;
+      this.tileChanged(hex);
     }
     return;
   }
@@ -636,11 +650,11 @@ World.prototype.clearClouds = function(position, radius) {
   }
 
 
-  for (var hex of Hex.circle(position, radius)) {
+  for (let hex of Hex.circle(position, radius)) {
     if (this.world_map.containsHex(hex)) {
       let tile = this.getTile(hex);
       tile.hidden = false;
-      tile.changed = true;
+      this.tileChanged(hex);
     }
   }
   return;

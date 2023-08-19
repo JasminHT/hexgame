@@ -30,11 +30,11 @@ var canv_input = new CanvasInput('canvas');
 //-------------Game-specific elements------------
 //Contains a world map, units, and resources
 
-let earth_radius = 115;
+let earth_radius = 45;
 let earth_location = new Point(3*35*10*80, 0);
 var earth = new World( earth_radius, 'earth', earth_location, );
 
-let mars_radius = 60;
+let mars_radius = 10;
 let mars_location = new Point(35*8*72+127, 0);
 var mars = new World( mars_radius,'earth', mars_location )
 
