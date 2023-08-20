@@ -66,7 +66,7 @@ export default function HUDRender(world, world_input, render) {
     let hex_selected = action_input.getHexSelected();
 
     if (action && actor && hex_selected) {
-      //action.updatePathfinding(world,hex_selected, hex_hovered, action.max_distance);
+      //action.updatePathfinding(world, hex_selected);
       action_path = action.getPath(world, hex_selected, hex_hovered, action.max_distance);
     } else {
       action_path = [];
@@ -85,9 +85,11 @@ export default function HUDRender(world, world_input, render) {
         return;
 
 
+      if (action.hover_action) {
         let hover_action = action.hover_action;
         hover_action.updatePathfinding(world_hovered, hex_hovered);
         action_targets = hover_action.getTargets(world_hovered, actor, hex_hovered );
+      }
 
     } 
 

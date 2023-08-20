@@ -178,7 +178,6 @@ export default function Action() {
         world.destroyUnit(target);
         world.createUnit(target, this.new_unit_type);
         let new_unit = world.getUnit(target);
-        //this.clearAllRangeClouds(world, new_unit, target);
       }
     }
 
@@ -213,15 +212,12 @@ export default function Action() {
 
   }
 
-  this.clearAllRangeClouds = function(world, new_actor, position) {
-    for (let action of actor.getActions()) {
-      if (action.activation(world, new_actor, position)) {
-        let range = action.getRange(world, new_actor, position);
-        for (let hex of range) 
-          world.clearClouds(hex);
-      }
-    }
-  }
+
+
+
+
+
+
 
 
 
@@ -236,8 +232,8 @@ export default function Action() {
       var action_range = Hex.circle(position, this.max_distance);
     } else {
 
-    if (!this.pathfinder_cache)
-      this.updatePathfinding(world, position);
+    //if (!this.pathfinder_cache)
+      //this.updatePathfinding(world, position);
 
     var action_range = this.pathfinder_cache.getRange( this.max_distance );
 
@@ -254,11 +250,8 @@ export default function Action() {
 
 
   this.getTargets = function(world, actor, position) {
-
     let action_range = this.getRange(world, actor, position);
-
     let suitable_targets = action_range.filter((target) => this.targetFilterFunction(world, actor, target));
-
     return suitable_targets;
   };
 
@@ -269,8 +262,8 @@ export default function Action() {
     if (this.sky_action)
       return undefined;
 
-    if (!this.pathfinder_cache)
-      this.updatePathfinding(world, origin);
+    //if (!this.pathfinder_cache)
+      //this.updatePathfinding(world, origin);
 
     var actionPath = this.pathfinder_cache.getPath( target );
 
@@ -303,11 +296,6 @@ export default function Action() {
 
 
 }
-
-  //Modifies the pathfinder array result to be returned
-  Map.prototype.currentCell = function(hex) {
-    return this.get(JSON.stringify(hex));
-  } ;
 
 
 
