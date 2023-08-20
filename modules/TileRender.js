@@ -6,11 +6,18 @@ export default function TileRender(world, hex_render) {
 
 
   this.drawTile = function(hex, tile) {
-    drawLand(hex, tile);
-    drawRiver(hex, tile);
-    drawRoad(hex, tile);
-    drawUnit(hex, tile);
-    drawResource(hex, tile);
+    
+    //draw clouds if not explored
+    if (tile.hidden) {
+      drawHex(hex, 32);
+
+    } else {
+      drawLand(hex, tile);
+      drawRiver(hex, tile);
+      drawRoad(hex, tile);
+      drawUnit(hex, tile);
+      drawResource(hex, tile);
+    }
   }
 
 
@@ -25,16 +32,10 @@ export default function TileRender(world, hex_render) {
     let brown = ['#421','#412','#431','#421','#412','#431','#421','#412','#431'];
     let blue = ['#216','#126','#114'];
 
-
-    //draw clouds if not explored
-    if (tile.hidden) {
-      drawHex(hex, 32);
-      return;
-    }
-
     if (tile.elevation < 0)
       return;
 
+    //normal tiles
     if (!tile.highlighted()) {
       drawHex(hex, tile.elevation);
       return;
@@ -62,19 +63,11 @@ export default function TileRender(world, hex_render) {
   function drawHex(hex, elevation, color) {
 
     var style = new RenderStyle();  
-
-    //analyze tile
-    var height = Math.floor(elevation);
-    style.fill_color = color_scale(height, world.type);
-    if (color)
-      style.fill_color = color;
-
+    style.fill_color = color || color_palette(elevation, world.type);
     hex_render.drawHex(hex, style);
   }
 
   function drawRiver(hex, tile) {
-
-    if (tile.hidden) return;
 
     let water_draw_level = 7;
     let max_draw_level = 150;
@@ -108,8 +101,6 @@ export default function TileRender(world, hex_render) {
 
   function drawRoad(hex, tile) {
 
-    if (tile.hidden) return;
-    
     let road_style = 'half only'
     let road_color = '#040';
 
@@ -149,8 +140,6 @@ export default function TileRender(world, hex_render) {
 
   //units and resources are both "unit" objects
   function drawEntity(hex, tile, unit) {
-    
-    if (tile.hidden) return;
 
     let view = hex_render.render.view;
 
@@ -240,7 +229,9 @@ export default function TileRender(world, hex_render) {
 
   //colors of different tiles depending on height
 
-  function color_scale (i, colortype) {
+  function color_palette(i, colortype) {
+
+    i = Math.floor(i);
 
     if (!colortype)
       var colortype = "earth";

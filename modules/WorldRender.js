@@ -47,10 +47,7 @@ export default function WorldRender (world, render) {
   }
 
 
-  this.drawChanged = function(max) {
-
-    if (!max)
-      var max = 100;
+  this.drawChanged = function(max = 100) {
 
     while (max) {
 
@@ -59,11 +56,10 @@ export default function WorldRender (world, render) {
 
       let next = world.getChangedHexes().shift();
 
-      if (next instanceof Hex) {
+      if (next instanceof Hex)
         drawTile(next)
-        max--; //count the number of hexes drawn
-      }
 
+      max--;
     }
   }
 
