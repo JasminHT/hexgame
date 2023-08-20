@@ -58,7 +58,7 @@ export default function actionExpand(distance) {
   this.preEffect = function(world, actor, position, target) {
 
     //Clicking a city: GROW IT
-    if (world.unitAtLocation(target) && world.getUnit(target).pop && world.getUnit(target).pop < 11) {
+    if (world.unitAtLocation(target) && world.getUnit(target).pop /*&& world.getUnit(target).pop < 11*/) {
       world.getUnit(target).pop++;
     }
   }
