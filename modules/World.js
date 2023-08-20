@@ -65,8 +65,6 @@ export default function World(radius, type, origin) {
   if (type == 'system') {
     
     this.world_map = new MapGenerator().makeSystemMap(radius);
-    //create units map
-    this.units = new HexMap();
     //for (let hex of Hex.circle(new Hex(0,0), 3))
     let hex = new Hex(0,0)
     this.createUnit(hex, 'star');
@@ -86,7 +84,6 @@ export default function World(radius, type, origin) {
 
 
     //create units map
-    this.units = new HexMap();
     this.resources = new HexMap();
     this.generateResources();
 
@@ -197,7 +194,7 @@ World.prototype.getRandomHex = function() {
 }
 
 World.prototype.getUnit = function(hex) {
-  return this.units.get(hex);
+  return this.getTile(hex).getUnit();
 }
 
 World.prototype.getChangedHexes = function() {
@@ -214,21 +211,20 @@ World.prototype.tileChanged = function(hex) {
 
 World.prototype.createUnit = function(hex, unit_type) {
 
-    this.tileChanged(hex);
     let new_unit = new Unit(unit_type, this);
-    this.units.set(hex, new_unit);
+    this.addUnit(hex, new_unit);
     return new_unit;
 }
 
 World.prototype.addUnit = function(hex, unit) {
   this.tileChanged(hex);
   unit.setWorld(this)
-  this.units.set(hex, unit);
+  this.getTile(hex).addUnit(unit);
 }
 
 World.prototype.destroyUnit = function(hex) {
   this.tileChanged(hex);
-    this.units.delete(hex);
+  this.getTile(hex).removeUnit();
 }
 
 
@@ -472,22 +468,7 @@ World.prototype.nearCoast = function(position, min_tiles, max_tiles) {
 
 //'unit' is overlooked, leave it undefined to avoid that
 World.prototype.noCitiesInArea = function(position, radius, position_to_ignore) {
-  let area = Hex.circle(position, radius);
-
-  for (let hex of area) {
-    //skip position_to_ignore
-    if (position_to_ignore && hex.equals(position_to_ignore))
-      continue;
-
-    //returns false if a city is here
-    if (this.units.containsHex(hex) ) {
-      if (this.getUnit(hex).type=='city')
-        return false;
-
-    }
-  }
-  //no cities
-  return true;
+  return this.noUnitTypeInArea(position, radius, 'city', position_to_ignore);
 }
 
 
@@ -500,10 +481,10 @@ World.prototype.noUnitTypeInArea = function(position, radius, unit_type, positio
       continue;
     
     //returns false if a city is here
-    if (this.units.containsHex(hex) ) {
-      if (this.getUnit(hex).type==unit_type)
-        return false;
-    }
+    if (this.containsHex(hex) ) 
+      if (this.getUnit(hex) instanceof Unit)
+        if (this.getUnit(hex).type==unit_type)
+         return false;
   }
   //no cities
   return true;

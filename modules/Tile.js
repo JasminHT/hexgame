@@ -8,6 +8,16 @@
   this.changed = true;
   this.hidden = false; //should be a highlight
 
+  this.addUnit = function(unit) {
+    this.unit = unit;
+  }
+  this.getUnit = function() {
+    return this.unit;
+  }
+  this.removeUnit = function() {
+    this.unit = null;
+  }
+
   this.addHighlight = function(color) {
     this.highlights[color] = true;
     this.changed = true;

@@ -126,7 +126,7 @@ export default function TileRender(world, hex_render) {
 
   function drawUnit(hex, tile) {
 
-    let unit = world.getUnit(hex)
+    let unit = tile.getUnit(hex)
     if (unit)
       drawEntity(hex, tile, unit);
   }
