@@ -236,9 +236,10 @@ export default function Action() {
       var action_range = Hex.circle(position, this.max_distance);
     } else {
 
-      if (!this.pathfinder_cache)
-        this.updatePathfinding(world, position);
-      var action_range = this.pathfinder_cache.getRange( this.max_distance );
+    if (!this.pathfinder_cache)
+      this.updatePathfinding(world, position);
+
+    var action_range = this.pathfinder_cache.getRange( this.max_distance );
 
     }
 
@@ -285,8 +286,6 @@ export default function Action() {
 
     let pathfinder = new ActionPathfinder(this);
     pathfinder.exploreMap(world, origin, this.max_distance, callback);
-
-
 
     this.pathfinder_cache = pathfinder;
 
