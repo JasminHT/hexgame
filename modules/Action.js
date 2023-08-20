@@ -284,6 +284,8 @@ export default function Action() {
     let action = this;
     var callback = function() {action.pathfinder_cache = pathfinder}
 
+
+    //TODO: pathfind asynchronously in multiple little steps
     let pathfinder = new ActionPathfinder(this);
     pathfinder.exploreMap(world, origin, this.max_distance, callback);
 
