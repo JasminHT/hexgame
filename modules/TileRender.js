@@ -69,18 +69,14 @@ export default function TileRender(world, hex_render) {
 
   function drawRiver(hex, tile) {
 
-    let water_draw_level = 7;
+    let min_draw_level = 7;
     let max_draw_level = 150;
 
     if (tile.river) {
 
       //downstream river first
       let downstream_hex = tile.river.downstream_hex;
-      let water_level = tile.river.water_level;
-      if (downstream_hex instanceof Hex && water_level >= water_draw_level){
-        let line_width = Math.floor(Math.sqrt(Math.min(water_level, max_draw_level)*9));
-        hex_render.drawCenterLine(hex, downstream_hex, line_width, '#22D', 'half only' );
-      }
+      drawHalfRiver(hex, downstream_hex, tile)
 
       //upstream rivers next
       let upstream_hexes = tile.river.upstream_hexes;
@@ -89,12 +85,16 @@ export default function TileRender(world, hex_render) {
           let upstream_tile = getTile(upstream_hex);
           if (!upstream_tile.river)
             continue;
-          let up_level = upstream_tile.river.water_level;
-          if (up_level >= water_draw_level){
-            let linewidth = Math.floor(Math.sqrt(Math.min(up_level,max_draw_level)*9));
-            hex_render.drawCenterLine(hex, upstream_hex, linewidth, '#22D', 'half only' );
-          }
+          drawHalfRiver(hex, upstream_hex, upstream_tile)
         }
+      }
+    }
+
+    function drawHalfRiver(hex, other_hex, tile) {
+      let water_level = tile.river.water_level;
+      if (other_hex instanceof Hex && water_level >= min_draw_level){
+        let line_width = Math.floor(Math.sqrt(Math.min(water_level, max_draw_level)*9));
+        hex_render.drawCenterLine(hex, other_hex, line_width, '#22D', 'half only' );
       }
     }
   }
@@ -103,25 +103,25 @@ export default function TileRender(world, hex_render) {
 
     let road_style = 'half only'
     let road_color = '#040';
-
+    road_color = 'saddlebrown';
 
     if (tile.road_to) 
-      drawRoadHalf(tile.road_to)
+      for (let to of tile.road_to.getHexes())
+        drawRoadHalf(to)
 
-    function drawRoadHalf(road_to) {
-      for (let to of road_to.getHexes()) {
-        
-        let road_size = road_to.getValue(to);
+    function drawRoadHalf(to) {
 
-        if (road_size < 1) 
-          continue;
+      let road_size = tile.road_to.getValue(to);
 
-        if (road_size > 8) 
-          road_color = 'saddlebrown'; 
-        
-        hex_render.drawCenterLine(hex, to, 3+road_size*2, road_color, 'half only');
-      }
+      if (road_size < 1) 
+        return;
+
+      if (road_size > 8) 
+        road_color = 'saddlebrown'; 
+      
+      hex_render.drawCenterLine(hex, to, 3+road_size*2, road_color, 'half only');
     }
+
   }
 
   function drawUnit(hex, tile) {
