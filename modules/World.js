@@ -173,24 +173,20 @@ World.prototype.tileCount = function() {
 ////////////////////////////////////////////////////
 
 
-World.prototype.getMapValue = function(hex) {
+World.prototype.getTile = function(hex) {
   return this.world_map.getValue(hex);
 }
-World.prototype.getTile = World.prototype.getMapValue;
 
 World.prototype.getNeighbors = function(hex) {
   return this.world_map.getNeighbors(hex);
 }
 
-World.prototype.getActor = function(hex) {
-  return this.getUnit(hex);
+World.prototype.getRandomHex = function() {
+  return this.world_map.getRandomHex();
 }
 
-
-World.prototype.getRandomHex = function() {
-
-  let random_hex = this.world_map.getRandomHex();
-  return random_hex;
+World.prototype.getActor = function(hex) {
+  return this.getUnit(hex);
 }
 
 World.prototype.getUnit = function(hex) {
@@ -198,15 +194,11 @@ World.prototype.getUnit = function(hex) {
 }
 
 World.prototype.getChangedHexes = function() {
-
   return this.tiles_changed;
 }
 
 World.prototype.tileChanged = function(hex) {
-  if (hex instanceof Hex) {
-    this.getTile(hex).changed = true;
     this.tiles_changed.push(hex);
-  }
 }
 
 World.prototype.createUnit = function(hex, unit_type) {

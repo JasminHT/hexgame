@@ -66,7 +66,6 @@ export default function WorldRender (world, render) {
   function drawTile(hex) {
 
     let tile = world.getTile(hex);
-    tile.changed = false;
 
     tile_render.drawTile(hex, tile)
   }
