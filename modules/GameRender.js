@@ -160,7 +160,7 @@ LayerRender.prototype.blit = function(canvas_name, view) {
 var attempt_count = 500;
 var draw_count = 200;
 LayerRender.prototype.drawTiles = function() {
-  this.world_render.drawSome('tiles', attempt_count, draw_count);
+  this.world_render.drawSome(attempt_count, draw_count);
 }
 
 LayerRender.prototype.clear = function () {

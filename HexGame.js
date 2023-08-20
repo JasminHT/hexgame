@@ -30,11 +30,11 @@ var canv_input = new CanvasInput('canvas');
 //-------------Game-specific elements------------
 //Contains a world map, units, and resources
 
-let earth_radius = 45;
-let earth_location = new Point(3*35*10*80, 0);
-var earth = new World( earth_radius, 'earth', earth_location, );
+let earth_radius = 65;
+let earth_location = new Point(35*10*80, 0);
+var earth = new World( earth_radius, 'dust', earth_location, );
 
-let mars_radius = 10;
+let mars_radius = 80;
 let mars_location = new Point(35*8*72+127, 0);
 var mars = new World( mars_radius,'earth', mars_location )
 
@@ -57,9 +57,9 @@ var view_input = new ViewInput(view);
 let worlds = [earth, mars];
 
 //Create a bunch more worlds!
-for (let i=0; i<0; i++) {
+for (let i=0; i<20; i++) {
   let new_world_location = system.getPoint(system.getRandomHex());
-  let radius = 55;
+  let radius = 25;
   let new_world = new World(radius, 'earth', new_world_location);
   new_world.clearClouds()
   worlds.push(new_world);
