@@ -248,8 +248,8 @@ export default function TileRender(world, hex_render) {
                       '#310','#310',
                       '#777', '#777','#777', //mountains 14 15 16
                       '#888','#888','#888', //mountains 17 18 19
-                      '#FFF','#FFF','#FFF','#FFF','#FFF','#FFF','#FFF','#FFF','#FFF','#FFF','#FFF','#FFF', //ice
-                      '#CCC']; //clouds
+                      '#CCC','#CCC','#CCC','#CCC','#CCC','#CCC','#CCC','#CCC','#CCC','#CCC','#CCC','#CCC', //ice
+                      '#EEE']; //clouds
                         return colors[i];
 
 
@@ -261,8 +261,8 @@ export default function TileRender(world, hex_render) {
                       '#412','#422',
                       '#777', '#777','#777', //mountains 14 15 16
                       '#888','#888','#888', //mountains 17 18 19
-                      '#FFF','#FFF','#FFF','#FFF','#FFF','#FFF','#FFF','#FFF','#FFF','#FFF','#0552','#FFF', //ice //atmosphere
-                      '#CCC']; //clouds
+                      '#CCC','#CCC','#CCC','#CCC','#CCC','#CCC','#CCC','#CCC','#CCC','#CCC','#0552','#CCC', //ice //atmosphere
+                      '#EEE']; //clouds
                         return colors[i];
 
 
@@ -274,8 +274,8 @@ export default function TileRender(world, hex_render) {
                       '#585951','#484951',
                       '#BBB', '#BBB','#BBB', //mountains 14 15 16
                       '#CCC','#DDD','#EEE', //mountains 17 18 19
-                      '#FFF','#FFF','#FFF','#FFF','#FFF','#FFF','#FFF','#FFF','#FFF','#FFF','#FFF','#FFF', //ice
-                      '#CCC']; //clouds
+                      '#CCC','#CCC','#CCC','#CCC','#CCC','#CCC','#CCC','#CCC','#CCC','#CCC','#CCC','#CCC', //ice
+                      '#EEE']; //clouds
                       return colors[i];
 
     default:
@@ -286,8 +286,8 @@ export default function TileRender(world, hex_render) {
                       '#B6B1B2', '#B4B1B4',
                       '#B4B4B8', '#B4B1B8','#B1B6B7', //mountains 14 15 16
                       '#CCC','#DDD','#EEE', //mountains 17 18 19
-                      '#FFF','#FFF','#FFF','#FFF','#FFF','#FFF','#FFF','#FFF','#FFF','#FFF','#FFF','#FFF', //ice
-                      '#CCC']; //clouds
+                      '#CCC','#CCC','#CCC','#CCC','#CCC','#CCC','#CCC','#CCC','#CCC','#CCC','#CCC','#CCC', //ice
+                      '#EEE']; //clouds
                         return colors[i];
 
     }

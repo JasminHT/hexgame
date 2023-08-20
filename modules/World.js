@@ -79,21 +79,25 @@ export default function World(radius, type, origin) {
 
     //create land map
     this.world_map = new MapGenerator('perlin').makeWorldMap(radius);
-    this.highlights_on = false;
-    this.makeCloudsEverywhere();
+    //this.makeCloudsEverywhere();
+    for (let hex of this.world_map.getHexes()) {
+      this.tileChanged(hex);
+    }
 
 
     //create units map
     this.units = new HexMap();
     this.resources = new HexMap();
+    this.generateResources();
 
-    if (type=='dust')
-      this.generateResources();
+    if (type=='dust') {
+
+    }
+
 
     if (type=='earth') {
-
       this.world_map = new RiverGenerator(this.world_map).getMap();
-      this.generateResources();
+
     }
 
   }
@@ -681,7 +685,6 @@ World.prototype.clearClouds = function(position, radius) {
 
 
   World.prototype.highlightRange = function(original_range, color) {
-    this.highlights_on = true;
 
     let range = original_range.concat(); //makes a copy of the array, in case it gets modified later
     let counter = 0;

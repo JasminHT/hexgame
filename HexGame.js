@@ -60,7 +60,7 @@ let worlds = [earth, mars];
 for (let i=0; i<20; i++) {
   let new_world_location = system.getPoint(system.getRandomHex());
   let radius = 25;
-  let new_world = new World(radius, 'earth', new_world_location);
+  let new_world = new World(radius, 'dust', new_world_location);
   new_world.clearClouds()
   worlds.push(new_world);
 }
@@ -100,7 +100,7 @@ view.setCenter( start_point );
 
 //clear some clouds
 earth.clearClouds(start_hex, 3);
-mars.clearClouds(new Hex(0,0), 100)
+//mars.clearClouds(new Hex(0,0), 100)
 
 
 

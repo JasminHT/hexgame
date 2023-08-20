@@ -116,6 +116,8 @@ export function PerlinConfiguration (config_name) {
       this.base = 5;
       break;
 
+    case 'default':
+    case 'perlin':
     default:
       this.scales = [0.02,0.1,0.2,0.5,1.0,2.0];
       this.weights = [16,8,4,2,1,0.5];
@@ -153,6 +155,7 @@ export function TileGenerator() {
 }
 
 TileGenerator.prototype.generateElevation = function(x,y) {
+
 }
 
 
@@ -177,7 +180,7 @@ RandomTileGenerator.prototype = Object.create(TileGenerator.prototype);
 export default function PerlinTileGenerator() {
 
   TileGenerator.call(this); 
-  var config = new PerlinConfiguration(1+Math.floor(Math.random()*7 ));
+  //var config = new PerlinConfiguration(1+Math.floor(Math.random()*20 ));
   var config = new PerlinConfiguration('perlin');
   var simplex = new SimplexNoise();  
 
