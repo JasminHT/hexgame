@@ -190,7 +190,8 @@ World.prototype.getActor = function(hex) {
 }
 
 World.prototype.getUnit = function(hex) {
-  return this.getTile(hex).getUnit();
+  if (this.containsHex(hex))
+    return this.getTile(hex).getUnit();
 }
 
 World.prototype.getChangedHexes = function() {

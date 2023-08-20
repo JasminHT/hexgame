@@ -168,7 +168,7 @@ export default function Action() {
 
     //generic effects applied to all actions depending on their qualities listed below
     if (this.takes_city_pop)       
-      actor.addPop(-this.cost);
+      this.actor.addPop(-this.cost);
 
     if (this.also_build_road)
       this.createRoad(world, position, target);
@@ -184,7 +184,7 @@ export default function Action() {
 
     if (this.collect_resource) {
       if (world.hasResource(target)) {
-        actor.addPop(1);
+        this.actor.addPop(1);
         world.highlightRange([target], 'green');
       }
     }
@@ -205,7 +205,7 @@ export default function Action() {
 
     if (this.transfer_pop)
       if (world.getUnit(target) && world.getUnit(target).pop) {
-        actor.addPop(world.getUnit(target).pop);
+        this.actor.addPop(world.getUnit(target).pop);
         world.getUnit(target).pop = 0;
       }
 

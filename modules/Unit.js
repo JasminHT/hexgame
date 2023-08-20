@@ -40,6 +40,7 @@ Unit.prototype.getActions = function() {
 }
 
 Unit.prototype.addAction = function( action ) {
+  action.actor = this;
   this.actions.push( action );
 }
 

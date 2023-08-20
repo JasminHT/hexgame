@@ -11,7 +11,7 @@
 
 import Hex from './u/Hex.js'
 import {Point, HexLayout, HexMap} from './u/Hex.js'
-import UnitInput from './UnitInput.js';
+import ActionInput from './ActionInput.js';
 import Events from './u/Events.js'
 
 
@@ -23,11 +23,11 @@ export default function WorldInput(world, view) {
 
 
   //this is where the world's unit controller is created
-  var unit_input = new UnitInput(world); 
+  var action_input = new ActionInput(world); 
   var hex_hovered = new Hex();
   var hex_hovered_previous = new Hex();
 
-  this.getUnitInput = () => unit_input
+  this.getActionInput = () => action_input
   this.getHexHovered = () => hex_hovered
 
   //Event listeners
@@ -53,7 +53,7 @@ export default function WorldInput(world, view) {
     //console.log(event.keyCode);
 
     if (event.keyCode === 187 || event.keyCode === 27) { // escape
-        unit_input.selectNothing();
+        action_input.selectNothing();
         //Events.emit('hex_hovered_changed', {world, hex_hovered});
     }
     return false;
@@ -82,7 +82,7 @@ export default function WorldInput(world, view) {
   //React to the screen being clicked at screen_position
   function clickScreenEvent(screen_position, device_type) {
     
-    if (unit_input != undefined) {
+    if (action_input != undefined) {
 
       var world_position = view.screenToWorld(screen_position);
       let hex_clicked = world.getHex(world_position);

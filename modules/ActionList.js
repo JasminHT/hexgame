@@ -18,6 +18,7 @@ export default function actionExpand(distance) {
 
   this.new_unit_type = 'city';
   this.hover_action = new actionGrowRoots(1);
+  this.hover_action.actor = this.actor;
 
   this.can_river = true;
   this.stop_on_rivers = true;
@@ -69,6 +70,7 @@ export default function actionExpand(distance) {
     if (world.unitAtLocation(target)) {
       let target_pop = world.getUnit(target).pop;
       this.after_action = new actionGrowRoots( target_pop );
+      this.after_action.actor = this.actor;
     }
   }
 }
@@ -188,6 +190,7 @@ export function actionMove(max_distance) {
   this.hover_radius = 3;
 
   this.hover_action = new actionGrowRoots(3);
+  this.hover_action.actor = this.actor;
   this.after_action = this.hover_action;
 
   this.cloud_clear = 6;

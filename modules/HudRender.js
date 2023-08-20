@@ -6,7 +6,7 @@ import updateTooltip from './Tooltip.js'
 
 export default function HUDRender(world, world_input, render) {
 
-  var unit_input = world_input.getUnitInput();
+  var action_input = world_input.getActionInput();
   var hex_render = new HexRender(render, world.getLayout() );
   var action_path = [];
   var action_targets = [];
@@ -61,9 +61,9 @@ export default function HUDRender(world, world_input, render) {
     if (!world.sameAs(world_hovered)) 
       return
 
-    let actor = unit_input.getActorSelected();
-    let action = unit_input.getActionSelected();
-    let hex_selected = unit_input.getHexSelected();
+    let actor = action_input.getActorSelected();
+    let action = action_input.getActionSelected();
+    let hex_selected = action_input.getHexSelected();
 
     if (action && actor && hex_selected) {
       //action.updatePathfinding(world,hex_selected, hex_hovered, action.max_distance);
@@ -75,8 +75,8 @@ export default function HUDRender(world, world_input, render) {
 
   function updateActionTargets (world_hovered, hex_hovered) {
     
-    let actor = unit_input.getActorSelected();
-    let action = unit_input.getActionSelected();
+    let actor = action_input.getActorSelected();
+    let action = action_input.getActionSelected();
 
     action_targets = [];
 
@@ -107,7 +107,7 @@ export default function HUDRender(world, world_input, render) {
   this.drawHUD = function() {
 
     var hex_hovered = world_input.getHexHovered();
-    var hex_selected = unit_input.getHexSelected();
+    var hex_selected = action_input.getHexSelected();
 
     if (hex_hovered && world.containsHex(hex_hovered)) 
       drawHoveredHex(hex_hovered);
@@ -115,11 +115,11 @@ export default function HUDRender(world, world_input, render) {
     if (!hex_selected) 
       return
 
-    let actor = unit_input.getActorSelected();
+    let actor = action_input.getActorSelected();
     if (!actor) 
       return
 
-    let action = unit_input.getActionSelected();
+    let action = action_input.getActionSelected();
     if (!action) 
       return;
 
@@ -205,7 +205,7 @@ export default function HUDRender(world, world_input, render) {
     hex_render.drawCenterLine(
           hex_selected,
           hex_selected.add(new Hex(20,-40)),
-          16*unit_input.getActorSelected().size, 
+          16*action_input.getActorSelected().size, 
           "rgba(0,200,200,"+(0.3+0.7*ocillate(1000))+")" );
   }
 
