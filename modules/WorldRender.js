@@ -14,10 +14,12 @@
 import CanvasDraw from './u/CanvasDraw.js'
 import World from './World.js'
 import Unit from './Unit.js'
+import {HexMap} from './u/Hex.js'
 import Hex from './u/Hex.js'
 import HexRender from './HexRender.js'
 import {RenderStyle} from './ViewRender.js'
 import TileRender from './TileRender.js'
+import Events from './u/Events.js'
 
 
 export default function WorldRender (world, render) {
@@ -25,11 +27,25 @@ export default function WorldRender (world, render) {
   var hex_render = new HexRender(render, world.getLayout() );
   var tile_render = new TileRender(world, hex_render);
 
+  var changed_hexes = new HexMap();
+  for (let hex of world.getHexes()) {
+    changed_hexes.set(hex,true);
+  }
+
+  Events.on('tile_changed', (e)=>watchChangedHexes(e.detail.world, e.detail.hex));
 
   this.clear = function() {
     hex_render.clear();
   }
 
+
+
+  function watchChangedHexes(changed_world, hex) {
+    
+    if (changed_world.sameAs(world))
+      if (world.containsHex(hex))
+        changed_hexes.set(hex,true);
+  }
 
 
   this.drawBigHex = function(radius) {
@@ -54,7 +70,7 @@ export default function WorldRender (world, render) {
       if (world.getChangedHexes().length == 0) 
         break;
 
-      let next = world.getChangedHexes().shift();
+      let next = changed_hexes.popHex(); 
 
       if (next instanceof Hex)
         drawTile(next)

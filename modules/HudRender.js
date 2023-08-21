@@ -66,7 +66,6 @@ export default function HUDRender(world, world_input, render) {
     let hex_selected = action_input.getHexSelected();
 
     if (action && actor && hex_selected) {
-      //action.updatePathfinding(world, hex_selected);
       action_path = action.getPath(world, hex_selected, hex_hovered, action.max_distance);
     } else {
       action_path = [];
@@ -85,6 +84,8 @@ export default function HUDRender(world, world_input, render) {
         return;
 
 
+      //ASYNCHRONOUS PATHFINDING: launch a pathfinding mission, and over time store results in "action_targets"
+      //pass in a callback so the PathFinder can send results back every so often?
       if (action.hover_action) {
         let hover_action = action.hover_action;
         hover_action.updatePathfinding(world_hovered, hex_hovered);
