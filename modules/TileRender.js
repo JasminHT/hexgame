@@ -125,7 +125,7 @@ export default function TileRender(world, hex_render) {
       if (road_size > 8) 
         road_color = 'saddlebrown'; 
       
-      hex_render.drawCenterLine(hex, to, 3+road_size*2, road_color, 'half only');
+      hex_render.drawCenterLine(hex, to, 9+road_size*2, road_color, 'half only');
     }
 
   }

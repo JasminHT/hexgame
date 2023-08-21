@@ -69,8 +69,8 @@ export default function actionExpand(distance) {
     //Collect resources around new node
     if (world.unitAtLocation(target)) {
       let target_pop = world.getUnit(target).pop;
-      this.after_action = new actionGrowRoots( target_pop );
-      this.after_action.actor = this.actor;
+      //this.after_action = new actionGrowRoots( target_pop );
+      //this.after_action.actor = this.actor;
     }
   }
 }
