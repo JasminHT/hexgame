@@ -27,12 +27,12 @@ export default function WorldRender (world, render) {
   var hex_render = new HexRender(render, world.getLayout() );
   var tile_render = new TileRender(world, hex_render);
 
-  var changed_hexes = new HexMap();
+  var hexes_to_draw = new HexMap();
   for (let hex of world.getHexes()) {
-    changed_hexes.set(hex,true);
+    hexes_to_draw.set(hex,true);
   }
 
-  Events.on('tile_changed', (e)=>watchChangedHexes(e.detail.world, e.detail.hex));
+  Events.on('tile_changed', (e) => watchChangedHexes(e.detail.world, e.detail.hex));
 
   this.clear = function() {
     hex_render.clear();
@@ -44,7 +44,7 @@ export default function WorldRender (world, render) {
     
     if (changed_world.sameAs(world))
       if (world.containsHex(hex))
-        changed_hexes.set(hex,true);
+        hexes_to_draw.set(hex,true);
   }
 
 
@@ -67,10 +67,7 @@ export default function WorldRender (world, render) {
 
     while (max) {
 
-      if (world.getChangedHexes().length == 0) 
-        break;
-
-      let next = changed_hexes.popHex(); 
+      let next = hexes_to_draw.popHex(); 
 
       if (next instanceof Hex)
         drawTile(next)
