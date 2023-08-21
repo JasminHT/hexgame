@@ -63,7 +63,7 @@ export default function WorldRender (world, render) {
   }
 
 
-  this.drawChanged = function(max = 100) {
+  this.drawTiles = function(max = 100) {
 
     while (max) {
 

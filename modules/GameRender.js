@@ -160,7 +160,7 @@ LayerRender.prototype.blit = function(canvas_name, view) {
 
 var draw_count = 200;
 LayerRender.prototype.drawTiles = function() {
-  this.world_render.drawChanged(draw_count);
+  this.world_render.drawTiles(draw_count);
 }
 
 LayerRender.prototype.clear = function () {
