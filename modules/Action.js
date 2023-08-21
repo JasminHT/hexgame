@@ -12,6 +12,8 @@ import {listContainsHex} from './u/Hex.js'
 
 //All actions inherit from this action
 export default function Action() {
+  
+  let self = this;
 
   //default action settings
   this.minimum_elevation = 2;
@@ -94,38 +96,22 @@ export default function Action() {
 
   this.doAction = function(world, actor, position, target) {
 
-    let self = this;
-
     if (self.infinite_range) {
+
       self.doSingleAction(world, actor, position, target);
-      self.updatePathfinding(world, position);
-      return;
-    }
 
-    //this part is messy, I don't need pathfinding on long-distance actions, for example
-    if (!self.pathfinder)
-         self.updatePathfinding(world, position, null, this.max_distance);
+    } else {
 
-    //var targets = this.getTargets(world, actor, position); 
-      
-    //if (targets.length <= 0 && !action.infinite_range)
-      //return;
+      if (!self.pathfinder)
+        self.updatePathfinding(world, position, null, this.max_distance);
 
 
-    //Either do a single action or do the action on all targets
-    if (self.multi_target) {
-      console.log('action is multitarget')
-
-      function targetCallback(hex) {
-        console.log('doing single: '+self.name)
-        self.doSingleAction(world, actor, position, hex);
-      }
-
-      self.getTargetsDynamic(world, actor, targetCallback);
-
-    } else { //single target
-      
-      self.doSingleAction(world, actor, position, target);
+      //multi-target actions start from the clickpoint and find their own targets to affect
+      //single-target actions affect the click-point directly
+      if (self.multi_target)
+        self.getTargetsDynamic(world, actor, (hex)=>self.doSingleAction(world, actor, target, hex) );
+      else     
+        self.doSingleAction(world, actor, position, target);
     }
 
     self.highlightRangeAsync(world, position);    
@@ -159,7 +145,7 @@ export default function Action() {
       this.actor.addPop(-this.cost);
 
     if (this.also_build_road)
-      this.createRoad(world, position, target);
+      this.createRoadAsync(world, position, target);
 
     if (this.new_unit_type) {
       if (this.replace_target || !world.unitAtLocation(target)) {
@@ -172,7 +158,7 @@ export default function Action() {
     if (this.collect_resource) {
       if (world.hasResource(target)) {
         this.actor.addPop(1);
-        world.highlightRange([target], 'green');
+        world.highlightHex(target, 'green');
       }
     }
 
@@ -299,6 +285,20 @@ export default function Action() {
     this.pathfinder.getTargetsDynamic( this.max_distance, filteredCallback );
   }
 
+  this.getTargetsDynamic2 = function(world, actor, callback) {
+    if (!this.pathfinder)
+      this.pathfinder = new ActionPathfinder(this);
+
+    let self=this;
+
+    let filteredCallback = function(hex) {
+      if (self.targetFilterFunction(world,actor,hex))
+        callback(hex);
+    }
+
+    this.pathfinder.getTargetsDynamic2( this.max_distance, filteredCallback );
+  }
+
 
 
   this.getPath = function(world, origin, target) {
@@ -311,6 +311,13 @@ export default function Action() {
     return actionPath;
   };
 
+  this.getPathAsync = function(world,origin,target, callback) {
+
+    if (this.sky_action)
+      return;
+
+    this.pathfinder.getPathAsync( target, callback );
+  }
 
   //store an explored pathfinding map, can be reused as needed
   //ASYNCHRONOUS PATHFINDING: launch a pathfinding mission, which will be done in little steps
@@ -330,19 +337,41 @@ export default function Action() {
 
   this.createRoad = function(world, origin, target, road_level = 1) {
 
-    var actionPath = this.getPath(world,origin,target,20);
+    var action_path = this.getPath(world,origin,target);
 
-    if (actionPath instanceof Array)
-      world.buildRoad(actionPath, road_level);
+    if (action_path instanceof Array)
+      world.buildRoad(action_path, road_level);
+  }
+
+  this.createRoadAsync = function(world, origin, target, road_level = 1) {
+
+
+
+    function roadCallback(action_path) {
+
+      if (action_path instanceof Array) {
+        world.buildRoad(action_path, road_level);
+      }
+    }
+
+    this.getPathAsync(world, origin, target, roadCallback);
+
+
   }
 
 
+
+  this.tileChanged = function(world,hex) {
+    this.pathfinder.tileChanged(world,hex)
+  }
 }
 
 
 
 
  
+
+
 
 
 

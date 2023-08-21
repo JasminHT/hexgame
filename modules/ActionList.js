@@ -17,7 +17,7 @@ export default function actionExpand(distance) {
   this.nextSelection = 'self';
 
   this.new_unit_type = 'city';
-  this.hover_action = new actionGrowRoots(1);
+  this.hover_action = new actionGrowRoots(20);
   this.hover_action.actor = this.actor;
 
   this.can_river = true;
@@ -126,7 +126,8 @@ export function actionGrowRoots(max_distance) {
   this.effect = function(world,actor,position,target) {
     //actor.addPop(1);
     world.createUnit(target, 'village');
-    world.highlightRange(Hex.circle(target, 2), 'green');
+    for (let hex of Hex.circle(target, 2))
+      world.highlightHex(hex, 'green');
   }
 }
 

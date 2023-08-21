@@ -31,6 +31,7 @@ export default function TileRender(world, hex_render) {
     let green = ['#228822','#226633', '#337744','#336633','#337722','#225533','#228822'];
     let brown = ['#421','#412','#431','#421','#412','#431','#421','#412','#431'];
     let blue = ['#216','#126','#114'];
+    let red = ['#812','#821','#811'];
 
     if (tile.elevation < 0)
       return;
@@ -41,9 +42,13 @@ export default function TileRender(world, hex_render) {
       return;
     }
 
+    if (tile.hasHighlight('red')) {
+      drawHex(hex, tile.elevation, red[tile.elevation%3] );
+      return;
+    }
     if (tile.hasHighlight('brown') && tile.elevation < 2) {
       //drawHex(hex, tile.elevation);
-      drawHex(hex, tile.elevation, blue[tile.elevation%7] );
+      drawHex(hex, tile.elevation, blue[tile.elevation%3] );
       return;
     }
 

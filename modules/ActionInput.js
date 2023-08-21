@@ -34,7 +34,7 @@ export default function ActionInput(world_origin) {
   this.getActionSelected = getActionSelected
 
   Events.on('hex_clicked', (event) => {clickHex(event.detail.world, event.detail.hex_clicked)} );
-
+  Events.on('tile_changed', (e) => tileChanged(e.detail.world, e.detail.hex));
 
 
   //-------1---------2---------3---------4---------5---------6--------7---------8--------
@@ -106,10 +106,11 @@ export default function ActionInput(world_origin) {
     }
   };
 
-  Events.on('tile_changed', (e) => tileChanged(e.detail.world, e.detail.hex));
+
   function tileChanged(world,hex) {
-    if (getActionSelected() && getActionSelected.tileChanged)
+    if (getActionSelected() && getActionSelected().tileChanged){
       getActionSelected().tileChanged(world,hex)
+    }
   }
 
   function getActionSelected() {

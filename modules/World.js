@@ -672,9 +672,8 @@ World.prototype.clearClouds = function(position, radius) {
 
   }
 
+  /*
   World.prototype.highlightRange = function(original_range, color) {
-
-    return;
 
     let range = original_range.concat(); //makes a copy of the array, in case it gets modified later
     let counter = 0;
@@ -710,7 +709,7 @@ World.prototype.clearClouds = function(position, radius) {
       stepByStepHighlight();
 
   }
-
+*/
 
 
 

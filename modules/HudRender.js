@@ -91,9 +91,9 @@ export default function HUDRender(world, world_input, render) {
 
         //returns a "dynamic array" that changes over time as the pathfinder progresses
         action_targets = [];
-        //hover_action.clearPathfinding();
-        //hover_action.getTargetsDynamic(world_hovered, actor, (hex)=>action_targets.push(hex) );
-        //hover_action.updatePathfinding(world_hovered, hex_hovered);
+        hover_action.clearPathfinding();
+        hover_action.getTargetsDynamic2(world_hovered, actor, (hex)=>action_targets.push(hex) );
+        hover_action.updatePathfinding(world_hovered, hex_hovered);
       }
 
     } 
