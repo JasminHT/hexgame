@@ -21,6 +21,7 @@ import RiverGenerator from './RiverGenerator.js'
 import BonusList from './BonusList.js'
 import Unit from './Unit.js'
 import Tile from './Tile.js'
+import Events from './u/Events.js'
 
 
 var land_tiles = [
@@ -199,6 +200,8 @@ World.prototype.getChangedHexes = function() {
 }
 
 World.prototype.tileChanged = function(hex) {
+  let world = this;
+  Events.emit('tile_changed', {world, hex});
     this.tiles_changed.push(hex);
 }
 
