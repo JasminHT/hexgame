@@ -660,8 +660,17 @@ World.prototype.clearClouds = function(position, radius) {
 /////        UI PERFORMANCE FUNCTION          //
 ////////////////////////////////////////////////
 
+  World.prototype.highlightHex = function(hex, color) {
+
+    let tile = this.getTile(hex);
+    tile.addHighlight(color);
+    this.clearClouds(hex,3);
+
+  }
 
   World.prototype.highlightRange = function(original_range, color) {
+
+    return;
 
     let range = original_range.concat(); //makes a copy of the array, in case it gets modified later
     let counter = 0;
@@ -685,12 +694,7 @@ World.prototype.clearClouds = function(position, radius) {
         } else {
 
           //color the tile with the new color
-          if (color) {
-            tile.addHighlight(color);
-            world.clearClouds(hex,3);
-          } else {
-            tile.addHighlight('neutral');
-          }
+          world.highlightHex(hex,color);
 
           //go to the next tile in 100ms
           counter++;

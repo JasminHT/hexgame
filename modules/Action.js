@@ -101,7 +101,7 @@ export default function Action() {
     }
 
     //this part is messy, I don't need pathfinding on long-distance actions, for example
-    if (!this.pathfinder_cache)
+    if (!this.pathfinder)
          this.updatePathfinding(world, position, null, this.max_distance);
 
     var targets = this.getTargets(world, actor, position); 
@@ -143,9 +143,10 @@ export default function Action() {
     } else { //single target
       action.doSingleAction(world, actor, position, target);
     }
-    
+
+    this.highlightRangeAsync(world, position);    
     this.updatePathfinding(world, position);
-    this.highlightRange(world, actor, position);
+
 
 
   };
@@ -224,7 +225,48 @@ export default function Action() {
 
 
 
-  this.getRange = function(world, actor, position) {
+  this.getRange = function(position) {
+
+    if (this.infinite_range)
+      return [];    
+
+    if (this.sky_action) {
+      var action_range = Hex.circle(position, this.max_distance);
+    } else {
+      var action_range = this.pathfinder.getRange( this.max_distance );
+    }
+
+    return action_range;
+  };
+
+  //calls the callback whenever a new hex is added by the pathfinder
+  this.getRangeAsync = function(position, callback) {
+    
+    if (this.infinite_range)
+      return;
+
+    if (this.sky_action) {
+      for (hex of Hex.circle(position, this.max_distance))
+        callback(hex);
+    } else {
+      this.pathfinder.getRangeAsync( this.max_distance, callback );
+    }
+  }
+
+
+  this.highlightRangeAsync = function(world, position) {
+    if (!this.pathfinder)
+      this.pathfinder = new ActionPathfinder(this);
+
+    let callback = function(hex) {world.highlightHex(hex, 'brown');}
+
+    this.getRangeAsync(position, callback);
+    
+  }
+
+
+
+  this.getTargets = function(world, actor, position) {
 
     if (this.infinite_range) {
       world.clearClouds();
@@ -234,26 +276,16 @@ export default function Action() {
     if (this.sky_action) {
       var action_range = Hex.circle(position, this.max_distance);
     } else {
-
-    var action_range = this.pathfinder_cache.getRange( this.max_distance );
-
+      var action_range = this.pathfinder.getRange( this.max_distance );
     }
 
-    return action_range;
-  };
-
-  this.highlightRange = function(world, actor, position) {
-    let action_range = this.getRange(world, actor, position);
-    world.highlightRange(action_range, 'brown');
-  }
-
-
-
-  this.getTargets = function(world, actor, position) {
-    let action_range = this.getRange(world, actor, position);
     let suitable_targets = action_range.filter((target) => this.targetFilterFunction(world, actor, target));
     return suitable_targets;
   };
+
+  this.getTargetsAsync = function(world,actor,position) {
+
+  }
 
 
 
@@ -262,7 +294,7 @@ export default function Action() {
     if (this.sky_action)
       return undefined;
 
-    var actionPath = this.pathfinder_cache.getPath( target );
+    var actionPath = this.pathfinder.getPath( target );
 
     return actionPath;
   };
@@ -273,13 +305,12 @@ export default function Action() {
   //can receive a callback function for the Pathfinding to call every so often
   this.updatePathfinding = function(world, origin) {
 
-    let action = this;
-    var callback = function() {action.pathfinder_cache = pathfinder}
+    if (!this.pathfinder)
+      this.pathfinder = new ActionPathfinder(this);
 
-    let pathfinder = new ActionPathfinder(this);
-    pathfinder.exploreMap(world, origin, this.max_distance, callback);
+    this.pathfinder.exploreMap(world, origin, this.max_distance);
 
-    this.pathfinder_cache = pathfinder;
+
 
   }
 

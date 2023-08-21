@@ -16,15 +16,16 @@ export default function PathFinder(stepCostFunction, getNeighborFunction, stopFu
   var visited = new Map();
   var origins = [];
   var map_explored = false;
+  var pathfinder = this;
 
   //setup 3 functions
   if (!stopFunction)
     var stopFunction = function(map, coordinate1, coordinate2, origin) {return false;};
 
   //call exploreMap first before calling the other four
-  this.exploreMap = function(map, origin, max_cost=10, callback) {
+  this.exploreMap = function(map, origin, max_cost=10) {
     initVisited(origin);
-    rangeFind(map, max_cost, null, callback);
+    rangeFind(map, max_cost, null);
     map_explored = true;
   }
   //Return a function which can be used many times
@@ -48,13 +49,26 @@ export default function PathFinder(stepCostFunction, getNeighborFunction, stopFu
     return getRangeArray(max_cost);
   };
 
-    //Returns a function which can be used many times to find range 
+  //Returns a function which can be used many times to find range 
   this.getTree = function(max_cost) {
     if (!map_explored)
       console.error('Pathfinder must call "exploreMap" at least once')
     return getRangeTree(max_cost);
   };
 
+
+
+
+  this.getRangeAsync = function(max_cost, callback) {
+    
+    //Adds a callback function to be triggered anytime a cell is added to visited
+    pathfinder.rangeCallback = function(cell) {
+        if (cell.path_cost <= max_cost) 
+          callback( cell.coord ); 
+      }
+
+
+  }
 
 
 
@@ -100,8 +114,12 @@ export default function PathFinder(stepCostFunction, getNeighborFunction, stopFu
     return visited.get(coord.getKey()) || false;
   } ;
 
-  function setVisited(coord, value) {
-   visited.set(coord.getKey(), value); 
+  //function called approximately ONCE per cell, as the pathfinder progresses
+  function setVisited(coord, cell) {
+    if (pathfinder.rangeCallback)
+      pathfinder.rangeCallback(cell);
+
+    visited.set(coord.getKey(), cell); 
   };
  
 
@@ -194,9 +212,9 @@ export default function PathFinder(stepCostFunction, getNeighborFunction, stopFu
   function considerNewCell(new_cell) {
 
     //new cells are always added
-    //if (!hasBeenVisited(new_cell)) {
-      //return true;
-    //}   
+    if (!hasBeenVisited(new_cell)) {
+      return true;
+    }   
     //revisited cells are added if better than before
     let current_cell = currentCell(new_cell.coord);
     if (!current_cell)
@@ -244,7 +262,7 @@ export default function PathFinder(stepCostFunction, getNeighborFunction, stopFu
 
 
   //recursive step of exploring the map
-  function rangeFind(map, max_cost, target = null, callback) {
+  function rangeFind(map, max_cost, target = null) {
 
     if (target)
       var coords_to_check = new PriorityQueue(   (coord1, coord2) => (currentCell(coord1).path_cost+Hex.distance(coord1,target) < 

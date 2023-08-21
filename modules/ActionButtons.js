@@ -81,8 +81,9 @@ export default function ActionButtons(menu_name) {
       let action = getActionFromId(actor, first_button.id);
 
       //ASYNCHRONOUS PATHFINDING: launch a pathfinding mission, give it a callback to highlight tiles
+      action.highlightRangeAsync(world, position);
       action.updatePathfinding(world, position);
-      action.highlightRange(world, actor, position);
+      
     }
   }
 

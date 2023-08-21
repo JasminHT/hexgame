@@ -88,8 +88,9 @@ export default function HUDRender(world, world_input, render) {
       //pass in a callback so the PathFinder can send results back every so often?
       if (action.hover_action) {
         let hover_action = action.hover_action;
-        hover_action.updatePathfinding(world_hovered, hex_hovered);
-        action_targets = hover_action.getTargets(world_hovered, actor, hex_hovered );
+
+        //returns a "dynamic array" that changes over time as the pathfinder progresses
+        action_targets = hover_action.getTargetsAsync(world_hovered, actor, hex_hovered );
       }
 
     } 
