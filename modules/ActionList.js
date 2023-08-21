@@ -82,7 +82,7 @@ export default function actionExpand(distance) {
 export function actionGrowRoots(max_distance) {
   Action.call(this);
 
-  this.name = "get-food";
+  this.name = "grow-roots";
   this.min_distance = 1;
   this.max_distance = max_distance;
   this.hover_radius = 0;

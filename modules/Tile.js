@@ -18,7 +18,8 @@
   }
 
   this.addHighlight = function(color) {
-    this.highlights[color] = true;  }
+    this.highlights[color] = true;  
+  }
   this.hasHighlight = function(color) {
     return (this.highlights[color] == true);
   }

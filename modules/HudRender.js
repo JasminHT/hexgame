@@ -90,7 +90,10 @@ export default function HUDRender(world, world_input, render) {
         let hover_action = action.hover_action;
 
         //returns a "dynamic array" that changes over time as the pathfinder progresses
-        action_targets = hover_action.getTargetsAsync(world_hovered, actor, hex_hovered );
+        action_targets = [];
+        //hover_action.clearPathfinding();
+        //hover_action.getTargetsDynamic(world_hovered, actor, (hex)=>action_targets.push(hex) );
+        //hover_action.updatePathfinding(world_hovered, hex_hovered);
       }
 
     } 

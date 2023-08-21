@@ -2,6 +2,7 @@
 
 import PriorityQueue from './PriorityQueue.js'
 import Hex from './Hex.js'
+import Events from './Events.js'
 
 //PathFinder cell used for mapping paths
 //Tracks the previous cell and total path cost
@@ -16,16 +17,19 @@ export default function PathFinder(stepCostFunction, getNeighborFunction, stopFu
   var visited = new Map();
   var origins = [];
   var map_explored = false;
-  var pathfinder = this;
+  var self = this;
+
+
 
   //setup 3 functions
   if (!stopFunction)
-    var stopFunction = function(map, coordinate1, coordinate2, origin) {return false;};
+    var stopFunction = function(world, coordinate1, coordinate2, origin) {return false;};
 
   //call exploreMap first before calling the other four
-  this.exploreMap = function(map, origin, max_cost=10) {
+  this.exploreMap = function(world, origin, max_cost=10) {
+    this.world = world;
     initVisited(origin);
-    rangeFind(map, max_cost, null);
+    rangeFind(world, max_cost, null);
     map_explored = true;
   }
   //Return a function which can be used many times
@@ -60,25 +64,66 @@ export default function PathFinder(stepCostFunction, getNeighborFunction, stopFu
 
 
   this.getRangeAsync = function(max_cost, callback) {
-    
     //Adds a callback function to be triggered anytime a cell is added to visited
-    pathfinder.rangeCallback = function(cell) {
+    self.rangeCallback = function(cell) {
         if (cell.path_cost <= max_cost) 
           callback( cell.coord ); 
       }
+  }
+
+  //calls a callback function whenever it finds an array
+  this.getTargetsAsync = function(max_cost, preFilteredCallback) {
+
+    self.targetCallback = function(cell) {
+      if (cell.path_cost <= max_cost) {
+
+        preFilteredCallback( cell.coord ); 
+      }
+    }
 
 
   }
 
+  //maintains the mutant_array as having all the targets
+  this.getTargetsDynamic = function(max_cost, preFilteredCallback) {
+
+    //function for future cells to be checked
+    self.targetDynamicCallback = function(cell) {
+      if (cell.path_cost <= max_cost) {
+        preFilteredCallback( cell.coord ); 
+      }
+    }
+
+    //check cells that already exist
+    for (let cell of visited.values()) {
+      self.targetDynamicCallback(cell);
+    }
+  }
 
 
-  
+  this.clear = function() {
+    visited = new Map();
+    origins = [];
+  }
 
+
+  //TODO: make sure to only check THIS world, this receives from all worlds
+
+  this.tileChanged = function(world,hex) {
+    if (!world.sameAs(self.world))
+      return;
+
+    console.log(hex)
+    if (hasCell(hex)) {
+      currentCell(hex).revisit = true;
+    }
+  }
 
   function PathFinderCell(coord, previous_coord, path_cost) {
     this.coord = coord;
     this.previous_coord = previous_coord;
     this.path_cost = path_cost;
+    this.revisit = false;
   };
 
 
@@ -86,7 +131,7 @@ export default function PathFinder(stepCostFunction, getNeighborFunction, stopFu
 
   //Creates a new map of the visited cells
   function initVisited(origin) {
-    visited = new Map();
+    //visited = new Map();
     origins = [];
 
     if (Array.isArray(origin)) {
@@ -109,15 +154,26 @@ export default function PathFinder(stepCostFunction, getNeighborFunction, stopFu
     return new PathFinderCell(coord, undefined, 0);
   };
 
-  //Modifies the pathfinder array result to be returned
   function currentCell(coord) {
     return visited.get(coord.getKey()) || false;
   } ;
 
   //function called approximately ONCE per cell, as the pathfinder progresses
   function setVisited(coord, cell) {
-    if (pathfinder.rangeCallback)
-      pathfinder.rangeCallback(cell);
+
+    if (self.rangeCallback)
+      self.rangeCallback(cell);
+
+    if (self.targetCallback) {
+      console.log('pathfinder targetcallback: ')
+      console.log(coord);
+      self.targetCallback(cell);
+    }
+
+    if (self.targetDynamicCallback) {
+      self.targetDynamicCallback(cell);
+    }
+
 
     visited.set(coord.getKey(), cell); 
   };
@@ -207,19 +263,27 @@ export default function PathFinder(stepCostFunction, getNeighborFunction, stopFu
   };
 
 
-  
+
   //Returns true if the new cell should be added in
   function considerNewCell(new_cell) {
 
     //new cells are always added
     if (!hasBeenVisited(new_cell)) {
       return true;
-    }   
-    //revisited cells are added if better than before
+    }
+
     let current_cell = currentCell(new_cell.coord);
     if (!current_cell)
       return true;
 
+    //changed cells are always visited
+    if (current_cell.revisit) {
+      current_cell.revisit = false;
+      return true;
+    }   
+
+
+    //revisited cells are added if better than before
     return newCellIsBetter(current_cell, new_cell);
   };
 
@@ -233,6 +297,7 @@ export default function PathFinder(stepCostFunction, getNeighborFunction, stopFu
   };
 
   function getGoodNeighbors(map, coord, max_cost) {
+
 
     let current_cell = currentCell( coord );
     let neighbor_coords = getNeighborFunction( map, current_cell.coord );
@@ -274,9 +339,21 @@ export default function PathFinder(stepCostFunction, getNeighborFunction, stopFu
       coords_to_check.push(origin);
       
 
-    //RUN THIS IN THE BACKGROUND, ASYNCHRONOUSLY, AND THEN CALLBACK
-    while (!coords_to_check.isEmpty())
+    //while (!coords_to_check.isEmpty())
+      //checkNextCell(coords_to_check, map, max_cost, target)
+
+    //ASYNC VERSION
+    stepByStepPathfinding();
+    function stepByStepPathfinding() {
+
+      if (coords_to_check.isEmpty())
+        return;
+
+
       checkNextCell(coords_to_check, map, max_cost, target)
+      setTimeout(stepByStepPathfinding, 50);
+    }
+    
 
   };
 
@@ -286,6 +363,7 @@ export default function PathFinder(stepCostFunction, getNeighborFunction, stopFu
     coords_checked++;
 
     let coord = coords_to_check.pop();
+
 
     //do not look further if stop function triggers
     let previous_coord = currentCell(coord).previous_coord;

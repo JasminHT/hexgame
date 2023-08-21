@@ -33,6 +33,7 @@ export default function WorldRender (world, render) {
   }
 
   Events.on('tile_changed', (e) => watchChangedHexes(e.detail.world, e.detail.hex));
+  Events.on('tile_revealed', (e) => watchChangedHexes(e.detail.world, e.detail.hex));
 
   this.clear = function() {
     hex_render.clear();

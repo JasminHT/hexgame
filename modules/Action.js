@@ -94,58 +94,42 @@ export default function Action() {
 
   this.doAction = function(world, actor, position, target) {
 
-    if (this.infinite_range) {
-      this.doSingleAction(world, actor, position, target);
-      this.updatePathfinding(world, position);
+    let self = this;
+
+    if (self.infinite_range) {
+      self.doSingleAction(world, actor, position, target);
+      self.updatePathfinding(world, position);
       return;
     }
 
     //this part is messy, I don't need pathfinding on long-distance actions, for example
-    if (!this.pathfinder)
-         this.updatePathfinding(world, position, null, this.max_distance);
+    if (!self.pathfinder)
+         self.updatePathfinding(world, position, null, this.max_distance);
 
-    var targets = this.getTargets(world, actor, position); 
-
-    let action = this;
+    //var targets = this.getTargets(world, actor, position); 
       
-    if (targets.length <= 0 && !action.infinite_range)
-      return;
+    //if (targets.length <= 0 && !action.infinite_range)
+      //return;
+
 
     //Either do a single action or do the action on all targets
-    if (action.multi_target) {
+    if (self.multi_target) {
+      console.log('action is multitarget')
 
-      //do actions in order from closest to furthest, with a preference for land tiles
-      targets.sort((a, b) => (world.getTile(a).onWater() && world.getTile(b).onLand()) ? 1 : -1);
-      //targets.sort((a, b) => (tree.currentCell(a).path_cost > tree.currentCell(b).path_cost) ? 1 : -1);
-      
-
-      let counter = 0;
-      let step_time = 500;
-
-      function stepByStep() {
-        let hex = targets[counter];
-        if (action.targetFilterFunction(world, actor, hex)) {
-          action.doSingleAction(world, actor, position, hex);
-          //for GrowRoots it doesn't matter, but pathfinding should be updated here in between every action too
-          //this requires the use of ASYNCHRONOUS PATHFINDING
-          //action.updatePathfinding(world, position);
-        } else {
-          step_time = 20;
-        }
-        counter++;
-        if (counter < targets.length)
-          setTimeout(stepByStep, step_time);
-        step_time = 500;
+      function targetCallback(hex) {
+        console.log('doing single: '+self.name)
+        self.doSingleAction(world, actor, position, hex);
       }
-      stepByStep();
 
+      self.getTargetsDynamic(world, actor, targetCallback);
 
     } else { //single target
-      action.doSingleAction(world, actor, position, target);
+      
+      self.doSingleAction(world, actor, position, target);
     }
 
-    this.highlightRangeAsync(world, position);    
-    this.updatePathfinding(world, position);
+    self.highlightRangeAsync(world, position);    
+    self.updatePathfinding(world, position);
 
 
 
@@ -260,6 +244,7 @@ export default function Action() {
 
     let callback = function(hex) {world.highlightHex(hex, 'brown');}
 
+
     this.getRangeAsync(position, callback);
     
   }
@@ -283,8 +268,35 @@ export default function Action() {
     return suitable_targets;
   };
 
-  this.getTargetsAsync = function(world,actor,position) {
+  this.getTargetsAsync = function(world,actor,callback) {
 
+    if (!this.pathfinder)
+      this.pathfinder = new ActionPathfinder(this);
+
+    let self=this;
+
+    function filteredCallback(hex) {
+      console.log('filtered callback for:'+hex)
+      if (self.targetFilterFunction(world,actor,hex))
+        callback(hex);
+    }
+
+    this.pathfinder.getTargetsAsync( this.max_distance, filteredCallback );
+
+  }
+
+  this.getTargetsDynamic = function(world, actor, callback) {
+    if (!this.pathfinder)
+      this.pathfinder = new ActionPathfinder(this);
+
+    let self=this;
+
+    let filteredCallback = function(hex) {
+      if (self.targetFilterFunction(world,actor,hex))
+        callback(hex);
+    }
+
+    this.pathfinder.getTargetsDynamic( this.max_distance, filteredCallback );
   }
 
 
@@ -309,9 +321,11 @@ export default function Action() {
       this.pathfinder = new ActionPathfinder(this);
 
     this.pathfinder.exploreMap(world, origin, this.max_distance);
+  }
 
-
-
+  this.clearPathfinding = function() {
+    if (this.pathfinder)
+      this.pathfinder.clear();
   }
 
   this.createRoad = function(world, origin, target, road_level = 1) {

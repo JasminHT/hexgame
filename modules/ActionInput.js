@@ -106,6 +106,12 @@ export default function ActionInput(world_origin) {
     }
   };
 
+  Events.on('tile_changed', (e) => tileChanged(e.detail.world, e.detail.hex));
+  function tileChanged(world,hex) {
+    if (getActionSelected() && getActionSelected.tileChanged)
+      getActionSelected().tileChanged(world,hex)
+  }
+
   function getActionSelected() {
     if (anActorIsSelected()) {
       let actor = getActorSelected();

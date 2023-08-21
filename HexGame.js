@@ -57,13 +57,13 @@ var view_input = new ViewInput(view);
 let worlds = [earth, mars];
 
 //Create a bunch more worlds!
-for (let i=0; i<20; i++) {
+/*for (let i=0; i<20; i++) {
   let new_world_location = system.getPoint(system.getRandomHex());
   let radius = 25;
   let new_world = new World(radius, 'dust', new_world_location);
   new_world.clearClouds()
   worlds.push(new_world);
-}
+}*/
 
 
 var world_inputs = [];

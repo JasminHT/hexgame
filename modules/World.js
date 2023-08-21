@@ -199,11 +199,12 @@ World.prototype.getChangedHexes = function() {
   return this.tiles_changed;
 }
 
-World.prototype.tileChanged = function(hex) {
+World.prototype.tileChanged = function(hex,reason) {
   let world = this;
   Events.emit('tile_changed', {world, hex});
     this.tiles_changed.push(hex);
 }
+
 
 World.prototype.createUnit = function(hex, unit_type) {
 
@@ -213,13 +214,13 @@ World.prototype.createUnit = function(hex, unit_type) {
 }
 
 World.prototype.addUnit = function(hex, unit) {
-  this.tileChanged(hex);
+  this.tileChanged(hex,'addunit');
   unit.setWorld(this)
   this.getTile(hex).addUnit(unit);
 }
 
 World.prototype.destroyUnit = function(hex) {
-  this.tileChanged(hex);
+  this.tileChanged(hex,'destroyunit');
   this.getTile(hex).removeUnit();
 }
 
@@ -246,8 +247,8 @@ World.prototype.buildRoad = function(hexarray, road_level) {
 
 World.prototype.addRoadTile = function(hex1, hex2, road_level) {
 
-  this.tileChanged(hex1);
-  this.tileChanged(hex2);
+  this.tileChanged(hex1,'road');
+  this.tileChanged(hex2,'road');
 
 
   if (!road_level)
@@ -335,7 +336,7 @@ World.prototype.hasResource = function(hex, resource_type = 'food') {
 }
 
 World.prototype.destroyResource = function(hex) {
-  this.tileChanged(hex);
+  this.tileChanged(hex,'destroy');
   this.resources.delete(hex);
   if (this.getResource(hex))
     this.total_resources -= 1;
@@ -514,13 +515,13 @@ World.prototype.generateUnknown = function() {
 }
 
 World.prototype.addResource = function(hex, type) {
-  this.tileChanged(hex);
+  this.tileChanged(hex,'resource');
   this.resources.set(hex, new Unit(type) );
   this.total_resources += 1;
 }
 
 World.prototype.addLocalResource = function(hex) {
-  this.tileChanged(hex);
+  this.tileChanged(hex,'resource');
   let terrain = this.getTile(hex);
 
   if (terrain.river && terrain.river.water_level >= 7) {
@@ -610,23 +611,26 @@ World.prototype.makeCloudsEverywhere = function() {
   for (let hex of this.world_map.getHexes()) {
       let tile = this.getTile(hex);
       tile.hidden = true;
-          this.tileChanged(hex)
+          this.tileChanged(hex,'cloud')
   }
 }
 
 World.prototype.clearClouds = function(position, radius) {
 
+  let world = this;
+
   if (!position) {
     for (let hex of this.world_map.getHexes()) {
       let tile = this.getTile(hex);
       tile.hidden = false;
-      this.tileChanged(hex);
+      Events.emit('tile_revealed', {world, hex});
     }
     return;
   }
 
   if (!radius) {
     this.world_map.get(position).hidden = false;
+    Events.emit('tile_revealed', {world, position});
     return;
   }
 
@@ -635,7 +639,7 @@ World.prototype.clearClouds = function(position, radius) {
     if (this.world_map.containsHex(hex)) {
       let tile = this.getTile(hex);
       tile.hidden = false;
-      this.tileChanged(hex);
+      Events.emit('tile_revealed', {world, hex});
     }
   }
   return;
