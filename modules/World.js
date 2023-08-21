@@ -664,6 +664,9 @@ World.prototype.clearClouds = function(position, radius) {
 /////        UI PERFORMANCE FUNCTION          //
 ////////////////////////////////////////////////
 
+  World.prototype.showPathfinding = function(hex, otherhex) {
+    this.getTile(hex).path_to = otherhex;
+  }
   World.prototype.highlightHex = function(hex, color) {
 
     let tile = this.getTile(hex);

@@ -17,8 +17,8 @@ export default function actionExpand(distance) {
   this.nextSelection = 'self';
 
   this.new_unit_type = 'city';
-  this.hover_action = new actionGrowRoots(20);
-  this.hover_action.actor = this.actor;
+  //this.hover_action = new actionGrowRoots(2);
+  //this.hover_action.actor = this.actor;
 
   this.can_river = true;
   this.stop_on_rivers = true;

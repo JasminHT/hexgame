@@ -15,6 +15,7 @@ export default function TileRender(world, hex_render) {
       drawLand(hex, tile);
       drawRiver(hex, tile);
       drawRoad(hex, tile);
+      drawPathfinding(hex, tile);
       drawUnit(hex, tile);
       drawResource(hex, tile);
     }
@@ -127,6 +128,20 @@ export default function TileRender(world, hex_render) {
       hex_render.drawCenterLine(hex, to, 3+road_size*2, road_color, 'half only');
     }
 
+  }
+
+  function drawPathfinding(hex, tile) {
+
+    let road_style = 'half only'
+    let road_color = 'black';
+
+    if (tile.path_to) 
+      hex_render.drawCenterLine(hex, tile.path_to, 6, road_color, 'half only');
+
+    for (let neighbor of hex.getNeighbors())
+      if (world.containsHex(neighbor))
+        if (world.getTile(neighbor).path_to && world.getTile(neighbor).path_to.equals(hex))
+          hex_render.drawCenterLine(hex,neighbor, 6, road_color, 'half only');
   }
 
   function drawUnit(hex, tile) {

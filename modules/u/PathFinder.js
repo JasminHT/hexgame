@@ -150,7 +150,7 @@ export default function PathFinder(stepCostFunction, getNeighborFunction, stopFu
 
     if (hasCell(hex)) {
       currentCell(hex).revisit = true;
-      
+
       for (let neighbor of getNeighborFunction(hex))
         if (hasCell(neighbor))
           currentCell(neighbor).revisit = true;
@@ -206,6 +206,9 @@ export default function PathFinder(stepCostFunction, getNeighborFunction, stopFu
 
   //function called approximately ONCE per cell, as the pathfinder progresses
   function setVisited(coord, cell) {
+
+    if (cell.previous_coord instanceof Hex)
+      self.world.showPathfinding(coord, cell.previous_coord)
 
     visited.set(coord.getKey(), cell); 
 
