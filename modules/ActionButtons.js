@@ -79,7 +79,8 @@ export default function ActionButtons(menu_name) {
     if (first_button && !first_button.disabled) {
       first_button.checked = true;
       let action = getActionFromId(actor, first_button.id);
-      
+
+      //ASYNCHRONOUS PATHFINDING: launch a pathfinding mission, give it a callback to highlight tiles
       action.updatePathfinding(world, position);
       action.highlightRange(world, actor, position);
     }

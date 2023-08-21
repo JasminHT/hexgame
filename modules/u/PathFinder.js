@@ -245,8 +245,7 @@ export default function PathFinder(stepCostFunction, getNeighborFunction, stopFu
 
   //recursive step of exploring the map
   function rangeFind(map, max_cost, target = null, callback) {
-    //console.trace();
-    //console.time('rangeFind')
+
     if (target)
       var coords_to_check = new PriorityQueue(   (coord1, coord2) => (currentCell(coord1).path_cost+Hex.distance(coord1,target) < 
                                                                       currentCell(coord2).path_cost+Hex.distance(coord2,target)) );  
@@ -256,13 +255,11 @@ export default function PathFinder(stepCostFunction, getNeighborFunction, stopFu
     for (let origin of origins)
       coords_to_check.push(origin);
       
-    //console.time('all')
-
 
     //RUN THIS IN THE BACKGROUND, ASYNCHRONOUSLY, AND THEN CALLBACK
     while (!coords_to_check.isEmpty())
       checkNextCell(coords_to_check, map, max_cost, target)
-    //callback();
+
   };
 
   var coords_checked = 0;

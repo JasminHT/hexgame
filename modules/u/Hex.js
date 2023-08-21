@@ -587,6 +587,14 @@ HexMap.prototype.getNeighbors = function(hex) {
   return neighbors_on_map;
 }
 
+HexMap.prototype.popHex = function() {
+  if (this.size() <= 0)
+    return;
+
+  let hex = this.getHexes().next().value;
+  this.delete(hex);
+  return hex;
+}
 HexMap.prototype.getRandomHex = function() {
   return [...this.hexes.values()][Math.floor(Math.random() * this.hexes.size)]
 }

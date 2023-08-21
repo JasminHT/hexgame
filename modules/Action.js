@@ -96,6 +96,7 @@ export default function Action() {
 
     if (this.infinite_range) {
       this.doSingleAction(world, actor, position, target);
+      this.updatePathfinding(world, position);
       return;
     }
 
@@ -103,8 +104,7 @@ export default function Action() {
     if (!this.pathfinder_cache)
          this.updatePathfinding(world, position, null, this.max_distance);
 
-    var tree = this.pathfinder_cache.getTree(this.max_distance);
-    var targets = this.getTargets(world, actor, position); //make a new range array because I'm going to sort it
+    var targets = this.getTargets(world, actor, position); 
 
     let action = this;
       
@@ -126,6 +126,9 @@ export default function Action() {
         let hex = targets[counter];
         if (action.targetFilterFunction(world, actor, hex)) {
           action.doSingleAction(world, actor, position, hex);
+          //for GrowRoots it doesn't matter, but pathfinding should be updated here in between every action too
+          //this requires the use of ASYNCHRONOUS PATHFINDING
+          //action.updatePathfinding(world, position);
         } else {
           step_time = 20;
         }
@@ -141,7 +144,7 @@ export default function Action() {
       action.doSingleAction(world, actor, position, target);
     }
     
-    //just to highlight the range again
+    this.updatePathfinding(world, position);
     this.highlightRange(world, actor, position);
 
 
@@ -208,7 +211,7 @@ export default function Action() {
         world.getUnit(target).pop = 0;
       }
 
-    this.updatePathfinding(world, position);
+
 
   }
 
@@ -231,9 +234,6 @@ export default function Action() {
     if (this.sky_action) {
       var action_range = Hex.circle(position, this.max_distance);
     } else {
-
-    //if (!this.pathfinder_cache)
-      //this.updatePathfinding(world, position);
 
     var action_range = this.pathfinder_cache.getRange( this.max_distance );
 
@@ -262,9 +262,6 @@ export default function Action() {
     if (this.sky_action)
       return undefined;
 
-    //if (!this.pathfinder_cache)
-      //this.updatePathfinding(world, origin);
-
     var actionPath = this.pathfinder_cache.getPath( target );
 
     return actionPath;
@@ -272,13 +269,13 @@ export default function Action() {
 
 
   //store an explored pathfinding map, can be reused as needed
+  //ASYNCHRONOUS PATHFINDING: launch a pathfinding mission, which will be done in little steps
+  //can receive a callback function for the Pathfinding to call every so often
   this.updatePathfinding = function(world, origin) {
 
     let action = this;
     var callback = function() {action.pathfinder_cache = pathfinder}
 
-
-    //TODO: pathfind asynchronously in multiple little steps
     let pathfinder = new ActionPathfinder(this);
     pathfinder.exploreMap(world, origin, this.max_distance, callback);
 
