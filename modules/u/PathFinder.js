@@ -7,211 +7,159 @@ import Events from './Events.js'
 //PathFinder cell used for mapping paths
 //Tracks the previous cell and total path cost
 //on 5e path.from the origin to cell
-//it take maps as arguments as returns maps as 'visited'
+//it take maps as arguments as returns maps
 export default function PathFinder(stepCostFunction, getNeighborFunction, stopFunction) {
 
-  //stepCostFunction must be          function(map, coordinate1, coordinate2)
-  //getNeighborFunction must be       function(map, coordinate)
-  //stopFunction is optional, must be function(map, coordinate1, coordinate2, (maybe origin))
+  //stepCostFunction must be          function(world, hex1, hex2)
+  //getNeighborFunction must be       function(world, hex)
+  //stopFunction is optional, must be function(world, hex1, hex2, (maybe origin))
 
-  var visited = new Map();
-  var origins = [];
-  var map_explored = false;
+  var tree = new Map();
+  this.origins = [];
+  this.exploring = false;
   var self = this;
-
+  this.hexes_to_check = new PriorityQueue(   (hex1, hex2) => (currentCell(hex1).path_cost < currentCell(hex2).path_cost) );
 
 
   //setup 3 functions
   if (!stopFunction)
-    var stopFunction = function(world, coordinate1, coordinate2, origin) {return false;};
+    var stopFunction = function(world, hex1, hex2, origin) {return false;};
 
-  //call exploreMap first before calling the other four
-  this.exploreMap = function(world, origin, max_cost=10) {
+
+
+
+
+
+
+
+
+
+//---------------MAIN EXPLORATION FUNCTIONS----------------------
+
+
+  //should only be called once per action
+  //otherwise the whole thing should be restarted clean
+  this.startExploring = function(world, origins, max_cost=10) {
 
     this.world = world;
-    initVisited(origin);
-    rangeFind(world, max_cost, null);
-    map_explored = true;
+    this.exploring = true;
+    this.max_cost = max_cost;
+
+    initialize(origins);
+
+    //begin an infinite loop here:
+    stepByStepPathfinding();
+
   }
-  //Return a function which can be used many times
-  this.getCost = function(target) {
-    if (!map_explored)
-      console.error('Pathfinder must call "exploreMap" at least once')
-    return currentCell(target).path_cost;
-  };
 
-  //Return a function which can be reused to find the path
-  this.getPath = function(target) {
-    if (!map_explored)
-      console.error('Pathfinder must call "exploreMap" at least once')
-    return targetPathfind(target);
-  };
+  function stepByStepPathfinding() {
 
-  //Returns a function which can be used many times to find range 
-  this.getRange = function(max_cost) {
-    if (!map_explored)
-      console.error('Pathfinder must call "exploreMap" at least once')
-    return getRangeArray(max_cost);
-  };
-
-  //Returns a function which can be used many times to find range 
-  this.getTree = function(max_cost) {
-    if (!map_explored)
-      console.error('Pathfinder must call "exploreMap" at least once')
-    return getRangeTree(max_cost);
-  };
-
-
-
-
-  this.getRangeAsync = function(max_cost, callback) {
-    //Adds a callback function to be triggered anytime a cell is added to visited
-    self.rangeCallback = function(cell) {
-        if (cell.path_cost <= max_cost) 
-          callback( cell.coord ); 
+    if (self.hexes_to_check.isEmpty()){
+      setTimeout(stepByStepPathfinding, 30);
+    } else {
+      console.log(self.hexes_to_check.size())
+      for (let i=0;i<1;i++) {
+        if (!self.hexes_to_check.isEmpty())
+          checkNextCell()
       }
+      setTimeout(stepByStepPathfinding, 10);
+    }
+    
   }
 
-  //this would be better if it could add multiple callbacks
-  //then each callback would take care of deleting itself
-  //when its function is achieved
-  this.getPathAsync = function(target, callback) {
+  function initialize(origin) {
 
-    let potential_path = targetPathfind(target);
-    if (potential_path instanceof Array) {
-      callback(potential_path);
-      return;
-    }
-
-    self.pathCallback = function(cell) {
-      if (cell.coord.equals(target)) {
-        console.log(visited)
-        callback(targetPathfind(cell.coord));
-        self.pathCallback = null;
-      }
-    }
-  }
-  //calls a callback function whenever it finds an array
-  this.getTargetsAsync = function(max_cost, preFilteredCallback) {
-
-    self.targetCallback = function(cell) {
-      if (cell.path_cost <= max_cost) {
-
-        preFilteredCallback( cell.coord ); 
-      }
-    }
-
-
-  }
-
-
-
-  //maintains the mutant_array as having all the targets
-  this.getTargetsDynamic = function(max_cost, preFilteredCallback) {
-
-    //function for future cells to be checked
-    self.targetDynamicCallback = function(cell) {
-      if (cell.path_cost <= max_cost) {
-        preFilteredCallback( cell.coord ); 
-      }
-    }
-
-    //check cells that already exist
-    for (let cell of visited.values()) {
-      self.targetDynamicCallback(cell);
-    }
-  }
-  this.getTargetsDynamic2 = function(max_cost, preFilteredCallback) {
-
-    //function for future cells to be checked
-    self.targetDynamicCallback = function(cell) {
-      if (cell.path_cost <= max_cost) {
-        preFilteredCallback( cell.coord ); 
-      }
-    }
-
-    //check cells that already exist
-    for (let cell of visited.values()) {
-      self.targetDynamicCallback2(cell);
-    }
-  }
-
-
-  this.clear = function() {
-    visited = new Map();
-    origins = [];
-  }
-
-
-
-  this.tileChanged = function(world,hex) {
-    if (!world.sameAs(self.world))
-      return;
-
-    if (hasCell(hex)) {
-      currentCell(hex).revisit = true;
-
-      for (let neighbor of getNeighborFunction(hex))
-        if (hasCell(neighbor))
-          currentCell(neighbor).revisit = true;
-    }
-
-  }
-
-  function PathFinderCell(coord, previous_coord, path_cost) {
-    this.coord = coord;
-    this.previous_coord = previous_coord;
-    this.path_cost = path_cost;
-    this.revisit = false;
-  };
-
-
-
-
-  //Creates a new map of the visited cells
-  function initVisited(origin) {
-    //visited = new Map();
-    origins = [];
+    self.origins = [];
 
     if (Array.isArray(origin)) {
 
       for (let position of origin) {
-        setVisited( position, makeOriginCell(position) );
-        origins.push(position);
+        updateTree( position, makeOriginCell(position) );
+        self.origins.push(position);
       }
     } else {
-      setVisited( origin, makeOriginCell(origin) );
-      origins.push(origin);
+      updateTree( origin, makeOriginCell(origin) );
+      self.origins.push(origin);
     }
+
+    for (let origin of self.origins)
+      recheckHex(origin);
   };
 
-  function getOriginArray() {
-    return origins;
+
+  //Function called repeatedly for every hex, and called again when something changes
+  function checkNextCell() {
+
+    let hex = self.hexes_to_check.pop();
+    let previous_hex = currentCell(hex).previous_hex;
+
+    self.world.removeHighlight(hex, 'green')
+
+    //do not look further if stop function triggers
+    if ( previous_hex && (stopFunction(self.world, previous_hex, hex, self.origins))  )
+      return;    
+
+    //Add the neighbors of this cell to the tree
+    let neighbors = getGoodNeighbors(hex, self.max_cost);
+    for (let cell of neighbors) {
+      self.world.highlightHex(cell.hex, 'green')
+      updateTree(cell.hex, cell); 
+      recheckHex(cell.hex)
+    }
+  } 
+
+  this.clear = function() {
+    tree = new Map();
+    self.origins = [];
   }
- 
-  function makeOriginCell(coord) {
-    return new PathFinderCell(coord, undefined, 0);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  //---------------INSTANT FUNCTIONS----------------------------
+
+  //Return a function which can be used many times
+  this.getCost = function(target) {
+    if (!this.exploring)
+      console.error('Pathfinder must call "explore Map" at least once')
+    return currentCell(target).path_cost;
   };
 
-  function currentCell(coord) {
-    return visited.get(coord.getKey()) || false;
-  } ;
-  function previousCell(coord) {
-    if ( currentCell(coord) )
-      if (currentCell(coord).previous_coord)
-        if (hasCell(currentCell(coord).previous_coord))
-          return currentCell(currentCell(coord).previous_coord);
-    return false;
-  }
+  //Returns a function which can be used many times to find range 
+  this.getRange = function(max_cost) {
+    if (!this.exploring)
+      console.error('Pathfinder must call "explore Map" at least once')
+    return getRangeArray(max_cost);
+  };
 
-  //function called approximately ONCE per cell, as the pathfinder progresses
-  function setVisited(coord, cell) {
 
-    if (cell.previous_coord instanceof Hex)
-      self.world.showPathfinding(coord, cell.previous_coord)
 
-    visited.set(coord.getKey(), cell); 
 
+
+
+
+
+
+
+
+
+
+
+
+  // -------------- ASYNC CALLBACK FUNCTIONS -------------------------------------
+
+  //Called when any cell is updated
+  function triggerCallbacks(cell) {
     if (self.rangeCallback)
       self.rangeCallback(cell);
 
@@ -229,56 +177,220 @@ export default function PathFinder(stepCostFunction, getNeighborFunction, stopFu
     if (self.pathCallback) {
       self.pathCallback(cell)
     }
+    if (self.pathCallback2) {
+      self.pathCallback2(cell)
+    }
+  }
+
+  this.getRangeAsync = function(max_cost, callback) {
+    //Adds a callback function to be triggered anytime a cell is added
+    self.rangeCallback = function(cell) {
+        if (cell.path_cost <= max_cost) 
+          callback( cell.hex ); 
+      }
+  }
+
+  //this would be better if it could add multiple callbacks
+  //then each callback would take care of deleting itself
+  //when its function is achieved
+  this.getPathAsync = function(target, callback) {
+
+    let potential_path = findPath(target);
+    if (potential_path instanceof Array) {
+      callback(potential_path);
+      return;
+    }
+
+    self.pathCallback = function(cell) {
+      if (cell.hex.equals(target)) {
+        callback(findPath(cell.hex));
+        self.pathCallback = null;
+      }
+    }
+  }
+  this.getPathAsync2 = function(target, callback) {
+
+    let potential_path = findPath(target);
+    if (potential_path instanceof Array) {
+      callback(potential_path);
+      return;
+    }
+
+    self.pathCallback2 = function(cell) {
+      if (cell.hex.equals(target)) {
+        callback(findPath(cell.hex));
+        self.pathCallback2 = null;
+      }
+    }
+  }
+  //calls a callback function whenever it finds an array
+  this.getTargetsAsync = function(max_cost, preFilteredCallback) {
+
+    self.targetCallback = function(cell){
+      if (cell.path_cost <= max_cost)
+        preFilteredCallback( cell.hex ); 
+    }
+  }
+
+  //maintains the mutant_array as having all the targets
+  this.getTargetsDynamic = function(max_cost, preFilteredCallback) {
+
+    //function for future cells to be checked
+    self.targetDynamicCallback = function(cell) {
+      if (cell.path_cost <= max_cost) {
+        preFilteredCallback( cell.hex ); 
+      }
+    }
+
+    //check cells that already exist
+    for (let cell of tree.values()) {
+      self.targetDynamicCallback(cell);
+    }
+  }
+  this.getTargetsDynamic2 = function(max_cost, preFilteredCallback) {
+
+    //function for future cells to be checked
+    self.targetDynamicCallback = function(cell) {
+      if (cell.path_cost <= max_cost) {
+        preFilteredCallback( cell.hex ); 
+      }
+    }
+
+    //check cells that already exist
+    for (let cell of tree.values()) {
+      self.targetDynamicCallback2(cell);
+    }
+  }
+
+  //This is triggered by Events when a tile changes
+  this.tileChanged = function( world,hex ) {
+    if (!world.sameAs(self.world))
+      return;
+
+    if (hasCell(hex)) {
+
+      recheckHex(hex);
+
+      for (let neighbor of getNeighborFunction(hex))
+        if (hasCell(neighbor)) {
+
+          recheckHex(neighbor);
+        }
+    }
+
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  //-----------------------------SMALL PATHFINDING FUNCTIONS---------------------
+
+
+  function Cell(hex, previous_hex, path_cost) {
+    this.hex = hex;
+    this.previous_hex = previous_hex;
+    this.path_cost = path_cost;
   };
+
+
+  function getOriginArray() {
+    return self.origins;
+  }
+ 
+  function makeOriginCell(hex) {
+    return new Cell(hex, undefined, 0);
+  };
+
+  function currentCell(hex) {
+    return tree.get(hex.getKey()) || false;
+  } ;
+
+  function previousCell(hex) {
+    if ( currentCell(hex) )
+      if (currentCell(hex).previous_hex)
+        if (hasCell(currentCell(hex).previous_hex))
+          return currentCell(currentCell(hex).previous_hex);
+    return false;
+  }
+
+  //function called approximately ONCE per cell, as the pathfinder progresses
+  function updateTree(hex, cell) {
+
+    //Draw black lines on the world map for debug purposes
+    if (cell.previous_hex instanceof Hex)
+      self.world.showPathfinding(hex, cell.previous_hex)
+
+    tree.set(hex.getKey(), cell); 
+    
+    triggerCallbacks(cell);
+
+  };
+
+  function recheckHex(hex) {
+
+    //test if the hex is already in there first!
+    for (let other_hex of self.hexes_to_check.getArray())
+      if (other_hex.equals(hex))
+        return;
+
+    //if not add in  
+    self.hexes_to_check.push(hex);
+    self.world.highlightHex(hex,'green')
+  }
  
 
-  function hasCell(coord) {
-    if (coord instanceof Hex)
-      return visited.has(coord.getKey()); 
+  function hasCell(hex) {
+    if (hex instanceof Hex)
+      return tree.has(hex.getKey()); 
     else
       return false;
   };
 
-  function calculateCost(map, cost_so_far, coord, previous_coord) {
+  function calculateCost(cost_so_far, hex, previous_hex) {
     
-    let step_cost = stepCostFunction(map, previous_coord, coord, getOriginArray());
+    let step_cost = stepCostFunction(self.world, previous_hex, hex, getOriginArray());
     return cost_so_far + step_cost;
   };
 
-  function makeNeighborCell(map, previous_cell) {
+  function makeNeighborCell(previous_cell) {
 
-    return function(coord) {
-      let previous_coord = previous_cell.coord;
-      let cost = calculateCost(map, previous_cell.path_cost, coord, previous_coord);
-      return new PathFinderCell(coord, previous_coord, cost);
+    return function(hex) {
+      let previous_hex = previous_cell.hex;
+      let cost = calculateCost(previous_cell.path_cost, hex, previous_hex);
+      return new Cell(hex, previous_hex, cost);
     };
   };
-
-
-  //Requires a pathfinded 'visited' array, returns an array of cells
-  //recursive
-  function calculatePath(origin, target) {
-    
-    if (origin.equals(target)) {
-      return [ makeOriginCell(origin) ];
-    }
-
-    //find path to the hex before target using function
-    let current_cell = currentCell(target);
-    let previous_coord = current_cell.previous_coord;
-
-    let partial_path = calculatePath(origin, previous_coord);
-    let full_path = partial_path.push(current_cell);
-
-    return full_path;
-  };
-
-
 
   //Return the cells worth revisiting for pathfinding
   function getCellsToRevisit(cells) {
 
     return cells.filter( (cell) => considerNewCell(cell) );
+  };
+
+  //Returns true if the new cell should be checked again
+  function considerNewCell(new_cell) {
+
+    //new cells are always added
+    if (neverSeen(new_cell))
+      return true;
+
+    let current_cell = currentCell(new_cell.hex);
+    if (!current_cell)
+      return true;
+
+    //cells are added if better than before
+    return (new_cell.path_cost < current_cell.path_cost);
+
   };
 
   //higher order function
@@ -290,11 +402,10 @@ export default function PathFinder(stepCostFunction, getNeighborFunction, stopFu
   };
 
 
-  function cellIsPassable(map) {
+  function cellIsPassable() {
 
     return function(cell) {
-      let coord = cell.coord;
-      return ( stepCostFunction(map, cell.previous_coord, coord, getOriginArray() ) != undefined );
+      return ( stepCostFunction(self.world, cell.previous_hex, cell.hex, getOriginArray() ) != undefined );
     };
   };
 
@@ -318,50 +429,23 @@ export default function PathFinder(stepCostFunction, getNeighborFunction, stopFu
     return true;
   };
 
-
-
-  //Returns true if the new cell should be added in
-  function considerNewCell(new_cell) {
-
-    //new cells are always added
-    if (!hasBeenVisited(new_cell)) {
-      return true;
-    }
-
-    let current_cell = currentCell(new_cell.coord);
-    if (!current_cell)
-      return true;
-
-    //changed cells are always visited
-    if (current_cell.revisit) {
-      current_cell.revisit = false;
-      return true;
-    }   
-
-
-    //revisited cells are added if better than before
-    return newCellIsBetter(current_cell, new_cell);
+  function neverSeen(cell) {
+    return !hasCell( cell.hex );
   };
 
-
-  function hasBeenVisited(cell) {
-    return hasCell( cell.coord );
-  };
-
-  function newCellIsBetter(cell, new_cell) {
+  function newPathIsShorter(cell, new_cell) {
     return (new_cell.path_cost < cell.path_cost);
   };
 
-  function getGoodNeighbors(map, coord, max_cost) {
+  function getGoodNeighbors(hex, max_cost) {
 
-
-    let current_cell = currentCell( coord );
+    let current_cell = currentCell( hex );
     if (!current_cell)
       return [];
 
-    let neighbor_coords = getNeighborFunction( map, current_cell.coord );
-    let neighbor_cells = neighbor_coords.map( makeNeighborCell(map, current_cell) );
-    let passable_cells = neighbor_cells.filter( cellIsPassable(map) );
+    let neighbor_hexes = getNeighborFunction( hex );
+    let neighbor_cells = neighbor_hexes.map( makeNeighborCell(current_cell) );
+    let passable_cells = neighbor_cells.filter( cellIsPassable() );
     let cells_in_range = passable_cells.filter( cellIsWithinCost(max_cost));
     let new_cells_to_add = getCellsToRevisit(cells_in_range); 
     return new_cells_to_add;
@@ -385,64 +469,6 @@ export default function PathFinder(stepCostFunction, getNeighborFunction, stopFu
 
 
 
-  //recursive step of exploring the map
-  function rangeFind(map, max_cost, target = null) {
-
-    if (target)
-      var coords_to_check = new PriorityQueue(   (coord1, coord2) => (currentCell(coord1).path_cost+Hex.distance(coord1,target) < 
-                                                                      currentCell(coord2).path_cost+Hex.distance(coord2,target)) );  
-    else
-      var coords_to_check = new PriorityQueue(   (coord1, coord2) => (currentCell(coord1).path_cost < currentCell(coord2).path_cost) );  
-
-    for (let origin of origins)
-      coords_to_check.push(origin);
-      
-
-    //while (!coords_to_check.isEmpty())
-      //checkNextCell(coords_to_check, map, max_cost, target)
-
-    //ASYNC VERSION
-    stepByStepPathfinding();
-    function stepByStepPathfinding() {
-
-      if (coords_to_check.isEmpty())
-        return;
-
-
-      checkNextCell(coords_to_check, map, max_cost, target)
-      setTimeout(stepByStepPathfinding, 10);
-    }
-    
-
-  };
-
-  var coords_checked = 0;
-  function checkNextCell(coords_to_check, map, max_cost, target = null) {
-
-    coords_checked++;
-
-    let coord = coords_to_check.pop();
-
-
-    //do not look further if stop function triggers
-    let previous_coord = currentCell(coord).previous_coord;
-
-    if ( previous_coord && (stopFunction(map, previous_coord, coord, origins))  )
-      return;
-
-    //Do not look at paths that pass through the target
-    if (target && target.equals(coord))
-      return;
-    
-
-    //Add the neighbors of this cell
-    let neighbors = getGoodNeighbors(map, coord, max_cost);
-
-    for (let cell of neighbors){
-      setVisited(cell.coord, cell); 
-      coords_to_check.push(cell.coord)
-    }
-  } 
 
 
 
@@ -452,55 +478,52 @@ export default function PathFinder(stepCostFunction, getNeighborFunction, stopFu
 
 
 
-  //Returns an array of coordinates of each cell that was visited 
+
+
+
+  //Returns an array of every hex explored
   function getRangeArray(max_cost) {
-    var coord_array = [];
-    for (let cell of visited.values()) {
+    var hex_array = [];
+    for (let cell of tree.values()) {
       if (cell.path_cost <= max_cost) {
-        coord_array.push( cell.coord ); 
+        hex_array.push( cell.hex ); 
       }
     }
-    return coord_array;
+    return hex_array;
   };
 
 
-  //Returns an array of coordinates of each cell that was visited, and the cell that leads to them 
-  function getRangeTree(max_cost) {
-    return visited;
-  };
+
  
-  //returns an array containing only the coordinates on the path to the target
-  function targetPathfind(target) {
-    //console.time('targetPathfind')
+  //returns an array containing only the hexes on the path to the target
+  function findPath(target) {
     let path_array = [];
     let max = 200;
 
     if (!hasCell(target)) 
-      return false;
+      return [];
 
-
-    let coord = target;
-  
     //trace path back from target to origin
-    while (currentCell(coord).previous_coord && max) {
+    let hex = target;
+    while (currentCell(hex).previous_hex && max) {
       max--;
 
-      let previous_coord = currentCell(coord).previous_coord
-      if (hasCell(previous_coord) && currentCell(previous_coord).previous_coord && currentCell(previous_coord).previous_coord.equals(coord)) {
+      let previous_hex = currentCell(hex).previous_hex
+      let previous_cell = currentCell(previous_hex);
+
+      if (previous_cell && previous_cell.previous_hex && previous_cell.previous_hex.equals(hex)) {
         console.log('loop in pathfinder')
-        self.world.highlightHex(previous_coord,'red')
-        self.world.highlightHex(coord,'red')
-        return false;
+        self.world.highlightHex(previous_hex,'red')
+        self.world.highlightHex(hex,'red')
+        return [];
       }
 
-      path_array.push(coord);
-      coord = previous_coord;
-
-
+      path_array.push(hex);
+      hex = previous_hex;
     }
 
-    path_array.push(coord);
-    //console.timeEnd('targetPathfind')
+    path_array.push(hex);
+
     return path_array;
   };
 

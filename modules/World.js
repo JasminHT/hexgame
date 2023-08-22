@@ -675,6 +675,11 @@ World.prototype.clearClouds = function(position, radius) {
 
   }
 
+  World.prototype.removeHighlight = function(hex,color) {
+    let tile = this.getTile(hex);
+    tile.removeHighlight(color);
+  }
+
   /*
   World.prototype.highlightRange = function(original_range, color) {
 

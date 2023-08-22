@@ -102,8 +102,8 @@ export default function Action() {
 
     } else {
 
-      if (!self.pathfinder)
-        self.updatePathfinding(world, position, null, this.max_distance);
+      //if (!self.pathfinder)
+        //self.updatePathfinding(world, position, null, this.max_distance);
 
 
       //multi-target actions start from the clickpoint and find their own targets to affect
@@ -115,7 +115,6 @@ export default function Action() {
     }
 
     self.highlightRangeAsync(world, position);    
-    self.updatePathfinding(world, position);
 
 
 
@@ -210,7 +209,7 @@ export default function Action() {
   };
 
   //calls the callback whenever a new hex is added by the pathfinder
-  this.getRangeAsync = function(position, callback) {
+  this.getRangeAsync = function(world, position, callback) {
     
     if (this.infinite_range)
       return;
@@ -221,18 +220,20 @@ export default function Action() {
     } else {
       this.pathfinder.getRangeAsync( this.max_distance, callback );
     }
+
+    this.updatePathfinding(world,position);
   }
 
 
   this.highlightRangeAsync = function(world, position) {
+
     if (!this.pathfinder)
       this.pathfinder = new ActionPathfinder(this);
 
     let callback = function(hex) {world.highlightHex(hex, 'brown');}
 
-
-    this.getRangeAsync(position, callback);
-    
+    this.getRangeAsync(world, position, callback);
+    this.updatePathfinding(world,position);
   }
 
 
@@ -268,6 +269,7 @@ export default function Action() {
     }
 
     this.pathfinder.getTargetsAsync( this.max_distance, filteredCallback );
+    this.updatePathfinding(world,position);
 
   }
 
@@ -283,6 +285,7 @@ export default function Action() {
     }
 
     this.pathfinder.getTargetsDynamic( this.max_distance, filteredCallback );
+    this.updatePathfinding(world,position);
   }
 
   this.getTargetsDynamic2 = function(world, actor, callback) {
@@ -297,19 +300,9 @@ export default function Action() {
     }
 
     this.pathfinder.getTargetsDynamic2( this.max_distance, filteredCallback );
+    this.updatePathfinding(world,position);
   }
 
-
-
-  this.getPath = function(world, origin, target) {
-
-    if (this.sky_action)
-      return undefined;
-
-    var actionPath = this.pathfinder.getPath( target );
-
-    return actionPath;
-  };
 
   this.getPathAsync = function(world,origin,target, callback) {
 
@@ -317,6 +310,16 @@ export default function Action() {
       return;
 
     this.pathfinder.getPathAsync( target, callback );
+    this.updatePathfinding(world,origin);
+  }
+
+  this.getPathAsync2 = function(world,origin,target, callback) {
+
+    if (this.sky_action)
+      return;
+
+    this.pathfinder.getPathAsync2( target, callback );
+    this.updatePathfinding(world, origin);
   }
 
   //store an explored pathfinding map, can be reused as needed
@@ -327,7 +330,10 @@ export default function Action() {
     if (!this.pathfinder)
       this.pathfinder = new ActionPathfinder(this);
 
-    this.pathfinder.exploreMap(world, origin, this.max_distance);
+    if (this.pathfinder.exploring)
+      return false;
+
+    this.pathfinder.startExploring(world, origin, this.max_distance);
   }
 
   this.clearPathfinding = function() {

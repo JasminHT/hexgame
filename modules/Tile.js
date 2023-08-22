@@ -20,6 +20,9 @@
   this.addHighlight = function(color) {
     this.highlights[color] = true;  
   }
+  this.removeHighlight = function(color) {
+    this.highlights[color] = false;  
+  }
   this.hasHighlight = function(color) {
     return (this.highlights[color] == true);
   }

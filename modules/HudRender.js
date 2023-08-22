@@ -51,7 +51,7 @@ export default function HUDRender(world, world_input, render) {
     hover_timeout = setTimeout(function(){ updateActionTargets(world_hovered, hex_hovered);
                                                updateActionPath(world_hovered, hex_hovered); 
                                                //updateTooltip(world, hex_hovered) 
-                                             }, 100);
+                                             }, 20);
 
   }
 
@@ -66,7 +66,7 @@ export default function HUDRender(world, world_input, render) {
     let hex_selected = action_input.getHexSelected();
 
     if (action && actor && hex_selected) {
-      action_path = action.getPath(world, hex_selected, hex_hovered, action.max_distance);
+      action.getPathAsync2(world, hex_selected, hex_hovered, (hexes)=>{action_path=hexes} );
     } else {
       action_path = [];
     }
@@ -185,7 +185,7 @@ export default function HUDRender(world, world_input, render) {
       //TODO FIX THIS MESS OF A FUNCTION
       let tile1 = world.getTile(hexarray[i]);
       let tile2 = world.getTile(hexarray[i+1])
-      if (!tile1.roadConnected(tile2))  //don't draw path through roads
+      //if (!tile1.roadConnected(tile2))  //don't draw path through roads
         hex_render.drawCenterLine(hexarray[i], hexarray[i+1], 6, color );
     }
   }

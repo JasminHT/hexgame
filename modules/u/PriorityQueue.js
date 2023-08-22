@@ -46,6 +46,9 @@ export default function PriorityQueue(comparator = (a, b) => a > b) {
   this._heap = [];
   this._comparator = comparator;
   
+  this.getArray = function() {
+    return this._heap;
+  }
   this.size = function() {
     return this._heap.length;
   }
