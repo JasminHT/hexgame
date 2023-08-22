@@ -102,14 +102,14 @@ export default function Action() {
 
     } else {
 
-      //if (!self.pathfinder)
-        //self.updatePathfinding(world, position, null, this.max_distance);
+      if (!self.pathfinder)
+        self.updatePathfinding(world, position, null, this.max_distance);
 
 
       //multi-target actions start from the clickpoint and find their own targets to affect
       //single-target actions affect the click-point directly
       if (self.multi_target)
-        self.getTargetsDynamic(world, actor, (hex)=>self.doSingleAction(world, actor, target, hex) );
+        self.getTargetsDynamic(world, actor, position, (hex)=>self.doSingleAction(world, actor, target, hex) );
       else     
         self.doSingleAction(world, actor, position, target);
     }
@@ -167,8 +167,9 @@ export default function Action() {
     //then do the action
     this.effect(world, actor, position, target);
 
-    if (this.after_action && this.after_action.multi_target)
+    if (this.after_action && this.after_action.multi_target){
       this.after_action.doAction(world, actor, target);
+    }
 
     //this appears twice
     if (this.collect_resource ) 
@@ -194,6 +195,10 @@ export default function Action() {
 
 
 
+  //Pathfinding stuff
+  //Should this be moved to ActionPathfinder?
+
+
   this.getRange = function(position) {
 
     if (this.infinite_range)
@@ -208,6 +213,12 @@ export default function Action() {
     return action_range;
   };
 
+  this.initialize = function(origin) {
+    if (!this.pathfinder)
+      this.pathfinder = new ActionPathfinder(this);
+
+    this.pathfinder.initialize(origin);
+  }
   //calls the callback whenever a new hex is added by the pathfinder
   this.getRangeAsync = function(world, position, callback) {
     
@@ -273,7 +284,7 @@ export default function Action() {
 
   }
 
-  this.getTargetsDynamic = function(world, actor, callback) {
+  this.getTargetsDynamic = function(world, actor, origin, callback) {
     if (!this.pathfinder)
       this.pathfinder = new ActionPathfinder(this);
 
@@ -285,10 +296,10 @@ export default function Action() {
     }
 
     this.pathfinder.getTargetsDynamic( this.max_distance, filteredCallback );
-    this.updatePathfinding(world,position);
+    this.updatePathfinding(world, origin);
   }
 
-  this.getTargetsDynamic2 = function(world, actor, callback) {
+  this.getTargetsDynamic2 = function(world, actor, origin, callback) {
     if (!this.pathfinder)
       this.pathfinder = new ActionPathfinder(this);
 
@@ -300,17 +311,17 @@ export default function Action() {
     }
 
     this.pathfinder.getTargetsDynamic2( this.max_distance, filteredCallback );
-    this.updatePathfinding(world,position);
+    this.updatePathfinding(world, origin);
   }
 
 
-  this.getPathAsync = function(world,origin,target, callback) {
+  this.getPathAsync = function(world, origin, target, callback) {
 
     if (this.sky_action)
       return;
 
     this.pathfinder.getPathAsync( target, callback );
-    this.updatePathfinding(world,origin);
+    this.updatePathfinding(world, origin);
   }
 
   this.getPathAsync2 = function(world,origin,target, callback) {
@@ -334,11 +345,6 @@ export default function Action() {
       return false;
 
     this.pathfinder.startExploring(world, origin, this.max_distance);
-  }
-
-  this.clearPathfinding = function() {
-    if (this.pathfinder)
-      this.pathfinder.clear();
   }
 
   this.createRoad = function(world, origin, target, road_level = 1) {

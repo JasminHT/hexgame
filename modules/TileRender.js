@@ -15,7 +15,7 @@ export default function TileRender(world, hex_render) {
       drawLand(hex, tile);
       drawRiver(hex, tile);
       drawRoad(hex, tile);
-      drawPathfinding(hex, tile);
+      //drawPathfinding(hex, tile);
       drawUnit(hex, tile);
       drawResource(hex, tile);
     }

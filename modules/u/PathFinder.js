@@ -18,7 +18,7 @@ export default function PathFinder(stepCostFunction, getNeighborFunction, stopFu
   this.origins = [];
   this.exploring = false;
   var self = this;
-  this.hexes_to_check = new PriorityQueue(   (hex1, hex2) => (currentCell(hex1).path_cost < currentCell(hex2).path_cost) );
+  
 
 
   //setup 3 functions
@@ -45,7 +45,7 @@ export default function PathFinder(stepCostFunction, getNeighborFunction, stopFu
     this.exploring = true;
     this.max_cost = max_cost;
 
-    initialize(origins);
+    this.initialize(origins);
 
     //begin an infinite loop here:
     stepByStepPathfinding();
@@ -57,7 +57,6 @@ export default function PathFinder(stepCostFunction, getNeighborFunction, stopFu
     if (self.hexes_to_check.isEmpty()){
       setTimeout(stepByStepPathfinding, 30);
     } else {
-      console.log(self.hexes_to_check.size())
       for (let i=0;i<1;i++) {
         if (!self.hexes_to_check.isEmpty())
           checkNextCell()
@@ -67,9 +66,14 @@ export default function PathFinder(stepCostFunction, getNeighborFunction, stopFu
     
   }
 
-  function initialize(origin) {
-
+  this.initialize = function(origin) {
+    
     self.origins = [];
+    tree = new Map();
+    this.hexes_to_check = new PriorityQueue(   
+      (hex1, hex2) => (currentCell(hex1).path_cost < currentCell(hex2).path_cost) 
+    );
+
 
     if (Array.isArray(origin)) {
 
@@ -102,16 +106,13 @@ export default function PathFinder(stepCostFunction, getNeighborFunction, stopFu
     //Add the neighbors of this cell to the tree
     let neighbors = getGoodNeighbors(hex, self.max_cost);
     for (let cell of neighbors) {
-      self.world.highlightHex(cell.hex, 'green')
+      //self.world.highlightHex(cell.hex, 'green')
       updateTree(cell.hex, cell); 
       recheckHex(cell.hex)
     }
   } 
 
-  this.clear = function() {
-    tree = new Map();
-    self.origins = [];
-  }
+
 
 
 
@@ -171,7 +172,7 @@ export default function PathFinder(stepCostFunction, getNeighborFunction, stopFu
       self.targetDynamicCallback(cell);
     }
     if (self.targetDynamicCallback2) {
-      self.targetDynamicCallback(cell);
+      self.targetDynamicCallback2(cell);
     }
 
     if (self.pathCallback) {
@@ -250,7 +251,7 @@ export default function PathFinder(stepCostFunction, getNeighborFunction, stopFu
   this.getTargetsDynamic2 = function(max_cost, preFilteredCallback) {
 
     //function for future cells to be checked
-    self.targetDynamicCallback = function(cell) {
+    self.targetDynamicCallback2 = function(cell) {
       if (cell.path_cost <= max_cost) {
         preFilteredCallback( cell.hex ); 
       }
@@ -345,7 +346,7 @@ export default function PathFinder(stepCostFunction, getNeighborFunction, stopFu
 
     //if not add in  
     self.hexes_to_check.push(hex);
-    self.world.highlightHex(hex,'green')
+    //self.world.highlightHex(hex,'green')
   }
  
 
