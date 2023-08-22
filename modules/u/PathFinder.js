@@ -57,7 +57,7 @@ export default function PathFinder(stepCostFunction, getNeighborFunction, stopFu
     if (self.hexes_to_check.isEmpty()){
       setTimeout(stepByStepPathfinding, 30);
     } else {
-      for (let i=0;i<1;i++) {
+      for (let i=0;i<10;i++) {
         if (!self.hexes_to_check.isEmpty())
           checkNextCell()
       }
@@ -67,7 +67,7 @@ export default function PathFinder(stepCostFunction, getNeighborFunction, stopFu
   }
 
   this.initialize = function(origin) {
-    
+
     self.origins = [];
     tree = new Map();
     this.hexes_to_check = new PriorityQueue(   
@@ -97,7 +97,7 @@ export default function PathFinder(stepCostFunction, getNeighborFunction, stopFu
     let hex = self.hexes_to_check.pop();
     let previous_hex = currentCell(hex).previous_hex;
 
-    self.world.removeHighlight(hex, 'green')
+    //self.world.removeHighlight(hex, 'green')
 
     //do not look further if stop function triggers
     if ( previous_hex && (stopFunction(self.world, previous_hex, hex, self.origins))  )
