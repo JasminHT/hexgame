@@ -44,7 +44,7 @@ export default function TileRender(world, hex_render) {
       return;
     }
 
-    if (tile.hasTag('pathfinding')) {
+    if (tile.hasTag('pathfinding') && tile.hasTag('brown')) {
       drawHex(hex, tile.elevation, yellow[tile.elevation%3] );
       return;
     }

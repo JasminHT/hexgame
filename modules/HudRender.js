@@ -184,7 +184,7 @@ export default function HUDRender(world, world_input, render) {
       //TODO FIX THIS MESS OF A FUNCTION
       let tile1 = world.getTile(hexarray[i]);
       let tile2 = world.getTile(hexarray[i+1])
-      //if (!tile1.roadConnected(tile2))  //don't draw path through roads
+      if (!tile1.roadConnected(tile2))  //don't draw path through roads
         hex_render.drawCenterLine(hexarray[i], hexarray[i+1], 6, color );
     }
   }

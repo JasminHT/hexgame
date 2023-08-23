@@ -344,9 +344,11 @@ export default function AsyncPathFinder(stepCostFunction, getNeighborFunction, s
       if (other_hex.equals(hex))
         return;
 
-    //if not add in  
-    self.hexes_to_check.push(hex);
-    self.world.tag(hex,'pathfinding')
+    //if not duplicate, add it
+    if (self.world.containsHex(hex)) {
+      self.hexes_to_check.push(hex);
+      self.world.tag(hex,'pathfinding')
+    }
   }
  
 

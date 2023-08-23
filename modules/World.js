@@ -178,7 +178,9 @@ World.prototype.getTile = function(hex) {
 }
 
 World.prototype.getNeighbors = function(hex) {
-  return this.world_map.getNeighbors(hex);
+  let six_neighbors = this.world_map.getNeighbors(hex);
+  let self = this;
+  return six_neighbors.filter( (hex) => self.getTile(hex) instanceof Tile );
 }
 
 World.prototype.getRandomHex = function() {

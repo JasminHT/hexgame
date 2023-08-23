@@ -15,7 +15,25 @@ export default function ActionPathfinder(action) {
   //create a pathfinder to explore the area around the unit
   AsyncPathFinder.call(this, stepCostFunction, getNeighborsFunction, stopFunction);
   this.action = action;
-  
+
+
+  //NEIGHBORS FUNCTION (for pathfinder)
+  function getNeighborsFunction(world, hex) {
+    return world.getNeighbors(hex);
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   //The StopFunction determines which steps makes the pathfinding end, for example embarking into water
   //It does not determine which steps are IMPOSSIBLE, those are determined in the step cost function
@@ -67,10 +85,7 @@ export default function ActionPathfinder(action) {
 
 
 
-  //NEIGHBORS FUNCTION (for pathfinder)
-  function getNeighborsFunction(world, hex) {
-    return world.getNeighbors(hex);
-  }
+
 
 
 
@@ -91,6 +106,9 @@ export default function ActionPathfinder(action) {
     }
 
     // COST IS UNDEFINED FOR THE FOLLOWING IMPOSSIBLE ACTIONS:
+
+    if (!next_tile || !this_tile)
+      return undefined;
 
     if (next_tile.onClouds())
       if (!action.can_explore)
