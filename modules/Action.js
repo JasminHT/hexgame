@@ -200,12 +200,11 @@ export default function Action() {
 
 
   this.initialize = function(world, origin) {
-    if (!this.pathfinder){
-      this.pathfinder = new ActionPathfinder(this);
+    if (!this.pathfinder)
       this.updatePathfinding(world, origin);
-    } else {
+      else 
       this.pathfinder.initialize(world, origin);  
-    }
+
 
     
   }
@@ -229,7 +228,7 @@ export default function Action() {
   this.highlightRangeAsync = function(world, position) {
 
     if (!this.pathfinder)
-      this.pathfinder = new ActionPathfinder(this);
+      this.updatePathfinding(world, position);
 
     let callback = function(hex) {world.tag(hex, 'brown');}
 
@@ -256,10 +255,10 @@ export default function Action() {
     return suitable_targets;
   };
 
-  this.getTargetsAsync = function(world,actor,callback) {
+  this.getTargetsAsync = function(world,actor,origin,callback) {
 
     if (!this.pathfinder)
-      this.pathfinder = new ActionPathfinder(this);
+      this.updatePathfinding(world, origin);
 
     let self=this;
 
@@ -269,13 +268,13 @@ export default function Action() {
     }
 
     this.pathfinder.getTargetsAsync( this.max_distance, filteredCallback );
-    this.updatePathfinding(world,position);
+    this.updatePathfinding(world,origin);
 
   }
 
   this.getTargetsDynamic = function(world, actor, origin, callback) {
     if (!this.pathfinder)
-      this.pathfinder = new ActionPathfinder(this);
+      this.updatePathfinding(world, hex);
 
     let self=this;
 
@@ -290,7 +289,7 @@ export default function Action() {
 
   this.getTargetsDynamic2 = function(world, actor, origin, callback) {
     if (!this.pathfinder)
-      this.pathfinder = new ActionPathfinder(this);
+      this.updatePathfinding(world, hex);
 
     let self=this;
 
@@ -356,6 +355,9 @@ export default function Action() {
 
 
   this.tileChanged = function(world,hex) {
+    if (!this.pathfinder)
+      this.updatePathfinding(world, hex);
+
     this.pathfinder.tileChanged(world,hex)
   }
 }
