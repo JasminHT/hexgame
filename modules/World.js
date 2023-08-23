@@ -810,7 +810,7 @@ function cutRiver(world, position) {
 }
 
 
-function hydroDam = function(world, target) {
+function hydroDam(world, target) {
     
     let tile = world.getTile(target);
     if (world.getTile(target).river.upstream_hexes) {
