@@ -33,32 +33,40 @@ export default function TileRender(world, hex_render) {
     let brown = ['#421','#412','#431','#421','#412','#431','#421','#412','#431'];
     let blue = ['#216','#126','#114'];
     let red = ['#812','#821','#811'];
+    let yellow = ['#992','#971','#872','#682','#892','#792','#981' ];
 
     if (tile.elevation < 0)
       return;
 
     //normal tiles
-    if (!tile.highlighted()) {
+    if (!tile.tagged()) {
       drawHex(hex, tile.elevation);
       return;
     }
 
-    if (tile.hasHighlight('red')) {
-      drawHex(hex, tile.elevation, red[tile.elevation%3] );
+    /*
+    if (tile.hasTag('pathfinding') && tile.elevation > 1) {
+      drawHex(hex, tile.elevation, yellow[tile.elevation%3] );
       return;
     }
-    if (tile.hasHighlight('brown') && tile.elevation < 2) {
+
+    if (tile.hasTag('error')) {
+      drawHex(hex, tile.elevation, red[tile.elevation%3] );
+      return;
+    }*/
+    
+    if (tile.hasTag('brown') && tile.elevation < 2) {
       //drawHex(hex, tile.elevation);
       drawHex(hex, tile.elevation, blue[tile.elevation%3] );
       return;
     }
 
-    if (tile.hasHighlight('green') && tile.elevation >= 2) {
+    if (tile.hasTag('green') && tile.elevation >= 2) {
       drawHex(hex, tile.elevation, green[tile.elevation%7] );
       return;
     }
 
-    if (tile.hasHighlight('brown')) {
+    if (tile.hasTag('brown')) {
       drawHex(hex, tile.elevation, brown[tile.elevation%7] );
       return;
     }
@@ -133,7 +141,7 @@ export default function TileRender(world, hex_render) {
   function drawPathfinding(hex, tile) {
 
     let road_style = 'half only'
-    let road_color = 'black';
+    let road_color = 'green';
 
     if (tile.path_to) 
       hex_render.drawCenterLine(hex, tile.path_to, 6, road_color, 'half only');

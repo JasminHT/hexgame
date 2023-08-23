@@ -157,7 +157,7 @@ export default function Action() {
     if (this.collect_resource) {
       if (world.hasResource(target)) {
         this.actor.addPop(1);
-        world.highlightHex(target, 'green');
+        world.tag(target, 'green');
       }
     }
 
@@ -196,28 +196,18 @@ export default function Action() {
 
 
   //Pathfinding stuff
-  //Should this be moved to ActionPathfinder?
+  //Should all of this be moved to ActionPathfinder?
 
 
-  this.getRange = function(position) {
-
-    if (this.infinite_range)
-      return [];    
-
-    if (this.sky_action) {
-      var action_range = Hex.circle(position, this.max_distance);
+  this.initialize = function(world, origin) {
+    if (!this.pathfinder){
+      this.pathfinder = new ActionPathfinder(this);
+      this.updatePathfinding(world, origin);
     } else {
-      var action_range = this.pathfinder.getRange( this.max_distance );
+      this.pathfinder.initialize(world, origin);  
     }
 
-    return action_range;
-  };
-
-  this.initialize = function(origin) {
-    if (!this.pathfinder)
-      this.pathfinder = new ActionPathfinder(this);
-
-    this.pathfinder.initialize(origin);
+    
   }
   //calls the callback whenever a new hex is added by the pathfinder
   this.getRangeAsync = function(world, position, callback) {
@@ -232,7 +222,7 @@ export default function Action() {
       this.pathfinder.getRangeAsync( this.max_distance, callback );
     }
 
-    this.updatePathfinding(world,position);
+    this.updatePathfinding(world, position);
   }
 
 
@@ -241,10 +231,10 @@ export default function Action() {
     if (!this.pathfinder)
       this.pathfinder = new ActionPathfinder(this);
 
-    let callback = function(hex) {world.highlightHex(hex, 'brown');}
+    let callback = function(hex) {world.tag(hex, 'brown');}
 
     this.getRangeAsync(world, position, callback);
-    this.updatePathfinding(world,position);
+    this.updatePathfinding(world, position);
   }
 
 
@@ -274,7 +264,6 @@ export default function Action() {
     let self=this;
 
     function filteredCallback(hex) {
-      console.log('filtered callback for:'+hex)
       if (self.targetFilterFunction(world,actor,hex))
         callback(hex);
     }
@@ -347,13 +336,6 @@ export default function Action() {
     this.pathfinder.startExploring(world, origin, this.max_distance);
   }
 
-  this.createRoad = function(world, origin, target, road_level = 1) {
-
-    var action_path = this.getPath(world,origin,target);
-
-    if (action_path instanceof Array)
-      world.buildRoad(action_path, road_level);
-  }
 
   this.createRoadAsync = function(world, origin, target, road_level = 1) {
 

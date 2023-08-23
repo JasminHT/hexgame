@@ -17,7 +17,7 @@ export default function actionExpand(distance) {
   this.nextSelection = 'self';
 
   this.new_unit_type = 'city';
-  this.hover_action = new actionGrowRoots(1);
+  this.hover_action = new actionGrowRoots(3);
   this.hover_action.actor = this.actor;
 
   this.can_river = true;
@@ -69,6 +69,7 @@ export default function actionExpand(distance) {
     //Collect resources around new node
     if (world.unitAtLocation(target)) {
       let target_pop = world.getUnit(target).pop;
+      //TODO uncomment
       this.after_action = new actionGrowRoots( target_pop );
       this.after_action.actor = this.actor;
     }
@@ -127,7 +128,7 @@ export function actionGrowRoots(max_distance) {
     //actor.addPop(1);
     world.createUnit(target, 'village');
     for (let hex of Hex.circle(target, 2))
-      world.highlightHex(hex, 'green');
+      world.tag(hex, 'green');
   }
 }
 

@@ -34,7 +34,7 @@ export default function ActionInput(world_origin) {
   this.getActionSelected = getActionSelected
 
   Events.on('hex_clicked', (event) => {clickHex(event.detail.world, event.detail.hex_clicked)} );
-  Events.on('tile_changed', (e) => tileChanged(e.detail.world, e.detail.hex));
+  Events.on('pathfinding_changed', (e) => tileChanged(e.detail.world, e.detail.hex));
 
 
   //-------1---------2---------3---------4---------5---------6--------7---------8--------

@@ -4,7 +4,7 @@
   this.hex = hex;
   this.elevation = elevation;
   this.wind = 0;
-  this.highlights = [];
+  this.tags = [];
   this.hidden = false; //should be a highlight
 
   this.addUnit = function(unit) {
@@ -17,17 +17,17 @@
     this.unit = null;
   }
 
-  this.addHighlight = function(color) {
-    this.highlights[color] = true;  
+  this.tag = function(color) {
+    this.tags[color] = true;  
   }
-  this.removeHighlight = function(color) {
-    this.highlights[color] = false;  
+  this.untag = function(color) {
+    this.tags[color] = false;  
   }
-  this.hasHighlight = function(color) {
-    return (this.highlights[color] == true);
+  this.hasTag = function(color) {
+    return (this.tags[color] == true);
   }
-  this.highlighted = function() {
-    return Object.keys(this.highlights).length > 0
+  this.tagged = function() {
+    return Object.keys(this.tags).length > 0
   }
   this.setElevation = function(elevation) { 
     this.elevation=elevation;

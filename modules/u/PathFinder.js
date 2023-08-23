@@ -45,7 +45,7 @@ export default function PathFinder(stepCostFunction, getNeighborFunction, stopFu
     this.exploring = true;
     this.max_cost = max_cost;
 
-    this.initialize(origins);
+    this.initialize(world, origins);
 
     //begin an infinite loop here:
     stepByStepPathfinding();
@@ -66,10 +66,11 @@ export default function PathFinder(stepCostFunction, getNeighborFunction, stopFu
     
   }
 
-  this.initialize = function(origin) {
+  this.initialize = function(world, origin) {
 
     self.origins = [];
     tree = new Map();
+    this.world = world;
     this.hexes_to_check = new PriorityQueue(   
       (hex1, hex2) => (currentCell(hex1).path_cost < currentCell(hex2).path_cost) 
     );
@@ -97,7 +98,7 @@ export default function PathFinder(stepCostFunction, getNeighborFunction, stopFu
     let hex = self.hexes_to_check.pop();
     let previous_hex = currentCell(hex).previous_hex;
 
-    //self.world.removeHighlight(hex, 'green')
+    self.world.untag(hex, 'pathfinding')
 
     //do not look further if stop function triggers
     if ( previous_hex && (stopFunction(self.world, previous_hex, hex, self.origins))  )
@@ -106,7 +107,6 @@ export default function PathFinder(stepCostFunction, getNeighborFunction, stopFu
     //Add the neighbors of this cell to the tree
     let neighbors = getGoodNeighbors(hex, self.max_cost);
     for (let cell of neighbors) {
-      //self.world.highlightHex(cell.hex, 'green')
       updateTree(cell.hex, cell); 
       recheckHex(cell.hex)
     }
@@ -142,6 +142,7 @@ export default function PathFinder(stepCostFunction, getNeighborFunction, stopFu
       console.error('Pathfinder must call "explore Map" at least once')
     return getRangeArray(max_cost);
   };
+
 
 
 
@@ -265,18 +266,17 @@ export default function PathFinder(stepCostFunction, getNeighborFunction, stopFu
 
   //This is triggered by Events when a tile changes
   this.tileChanged = function( world,hex ) {
+    
     if (!world.sameAs(self.world))
       return;
 
     if (hasCell(hex)) {
-
       recheckHex(hex);
 
       for (let neighbor of getNeighborFunction(hex))
-        if (hasCell(neighbor)) {
-
+        if (hasCell(neighbor))
           recheckHex(neighbor);
-        }
+
     }
 
   }
@@ -339,14 +339,14 @@ export default function PathFinder(stepCostFunction, getNeighborFunction, stopFu
 
   function recheckHex(hex) {
 
-    //test if the hex is already in there first!
+    //avoiding duplicates
     for (let other_hex of self.hexes_to_check.getArray())
       if (other_hex.equals(hex))
         return;
 
     //if not add in  
     self.hexes_to_check.push(hex);
-    //self.world.highlightHex(hex,'green')
+    self.world.tag(hex,'pathfinding')
   }
  
 
@@ -513,9 +513,9 @@ export default function PathFinder(stepCostFunction, getNeighborFunction, stopFu
       let previous_cell = currentCell(previous_hex);
 
       if (previous_cell && previous_cell.previous_hex && previous_cell.previous_hex.equals(hex)) {
-        console.log('loop in pathfinder')
-        self.world.highlightHex(previous_hex,'red')
-        self.world.highlightHex(hex,'red')
+        console.error('loop in pathfinder')
+        self.world.tag(previous_hex,'error')
+        self.world.tag(hex,'error')
         return [];
       }
 

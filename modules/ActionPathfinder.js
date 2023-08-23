@@ -10,12 +10,12 @@ import PathFinder from './u/PathFinder.js'
 
 export default function ActionPathfinder(action) {
 
+
+
   //create a pathfinder to explore the area around the unit
   PathFinder.call(this, stepCostFunction, getNeighborsFunction, stopFunction);
-
-  function getPathfinder() {
-    return this.pathfinder;
-  }
+  this.action = action;
+  
 
   //The StopFunction determines which steps makes the pathfinding end, for example embarking into water
   //It does not determine which steps are IMPOSSIBLE, those are determined in the step cost function
