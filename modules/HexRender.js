@@ -175,6 +175,27 @@ HexRender.p.drawHexes = function(hex_array, range_style) {
   this.drawHexOutline( outline,range_style);
 }
 
+HexRender.p.drawDot = function(hex, size, color='grey') {
+
+  var position = this.hexToPoint(hex);
+
+  var style = new RenderStyle();
+  style.fill_color = color;
+
+  this.render.drawDot(position, size, style);
+}
+
+HexRender.p.drawText = function(text, hex, size, color='grey') {
+  
+  var position = this.hexToPoint(hex);
+
+  let text_style = new RenderStyle();
+  text_style.text_size = size;
+  text_style.text_color = color;
+
+  this.render.drawText(text, position, text_style, true);
+}
+
 
 HexRender.prototype.clear = function() {
   this.render.clear();

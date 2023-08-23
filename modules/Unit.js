@@ -18,6 +18,8 @@ export default function Unit(unit_type, world) {
   this.selectable = true;
   this.world = world;
 
+  this.pop = 0;
+
   this.id = unit_id_incrementer++;
   this.actions = [];
 

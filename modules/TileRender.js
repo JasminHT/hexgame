@@ -44,8 +44,7 @@ export default function TileRender(world, hex_render) {
       return;
     }
 
-    /*
-    if (tile.hasTag('pathfinding') && tile.elevation > 1) {
+    if (tile.hasTag('pathfinding')) {
       drawHex(hex, tile.elevation, yellow[tile.elevation%3] );
       return;
     }
@@ -53,7 +52,7 @@ export default function TileRender(world, hex_render) {
     if (tile.hasTag('error')) {
       drawHex(hex, tile.elevation, red[tile.elevation%3] );
       return;
-    }*/
+    }
     
     if (tile.hasTag('brown') && tile.elevation < 2) {
       //drawHex(hex, tile.elevation);
@@ -117,7 +116,7 @@ export default function TileRender(world, hex_render) {
 
     let road_style = 'half only'
     let road_color = '#040';
-    road_color = 'saddlebrown';
+    //road_color = 'saddlebrown';
 
     if (tile.road_to) 
       for (let to of tile.road_to.getHexes())
@@ -132,8 +131,9 @@ export default function TileRender(world, hex_render) {
 
       if (road_size > 8) 
         road_color = 'saddlebrown'; 
-      
-      hex_render.drawCenterLine(hex, to, 9+road_size*2, road_color, 'half only');
+
+      let line_width = Math.min(9+road_size*2, 35);
+      hex_render.drawCenterLine(hex, to, line_width, road_color, 'half only');
     }
 
   }
@@ -169,51 +169,30 @@ export default function TileRender(world, hex_render) {
   //units and resources are both "unit" objects
   function drawEntity(hex, tile, unit) {
 
-    let view = hex_render.render.view;
-
-    var position = hex_render.hexToPoint(hex);
-   
-    var unit_style = new RenderStyle();
-    unit_style.fill_color = unit.color;
-
-
-    if (unit.type == 'unknown')
-      unit_style.fill_color = "rgba("+(128+127*ocillate(1000))+","+(255*ocillate(1000))+","+(128-128*ocillate(1000))+",1)";
-
-    let zoom = view.getZoom();
-    let size = 10*unit.size*world.getZoom();
-
+    let size = 10*unit.size;
 
     //large units
-    if (unit.size > 4 || (unit.pop && unit.pop > 9))
-      hex_render.drawHex(hex, unit_style);
+    if ( unit.size > 4 || unit.pop > 9 )
+      drawHex(hex, 0, unit.color);
     
     //medium units
-    if (unit.pop && unit.pop >= 2 && unit.pop <= 9) {
-      hex_render.render.drawDot(position, Math.min(size, 1.5*size/zoom ), unit_style);
-    }
+    if (unit.pop >= 2 && unit.pop <= 9)
+      hex_render.drawDot(hex, size, unit.color);
 
     
     if (world.biggestRoad(hex) <= 8) {
-      
       //small units
-      if (unit.pop && unit.pop < 2 && unit.size <= 4) 
-          hex_render.render.drawDot(position, Math.min(size/2, 1.5*size/2/zoom ), unit_style);
+      if (unit.pop < 2 && unit.size <= 4) 
+        hex_render.drawDot(hex, size/2, unit.color);
       //resources and colonies
-      if (!unit.pop && unit.size <= 4)
-        hex_render.render.drawDot(position, Math.min(size, 1.5*size/zoom ), unit_style);
+      if (unit.pop <= 0 && unit.size <= 4)
+        hex_render.drawDot(hex, size, unit.color);
     }
 
 
-    
-    //draw a number on the unit
-    if (unit.pop && unit.pop >= 2) {
-      let text_style = new RenderStyle();
-      let zoom = view.getZoom();
-      text_style.text_size = Math.min(45, 1.5*45/zoom );
-      let text = unit.pop;      
-      hex_render.render.drawText(text, position, text_style, true);
-    }
+    //draw a number on some units    
+    if (unit.pop >= 2)     
+      hex_render.drawText(unit.pop, hex, 45, 'black');
 
   };
 
