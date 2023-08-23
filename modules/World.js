@@ -228,6 +228,27 @@ World.prototype.destroyUnit = function(hex) {
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//////////////////////////////////////////////////
+
+//              ROAD FUNCTIONS
+
+////////////////////////////////////////////////////
+
 World.prototype.buildRoad = function(hexarray, road_level) {
   let previous_hex;
 
@@ -318,6 +339,29 @@ World.prototype.removeRoads = function(hex) {
   this.getTile(hex).road_to = null;
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 World.prototype.getResource = function(hex) {
   return this.resources.get(hex);
@@ -730,3 +774,68 @@ World.prototype.bonusEnabled = function(bonus_name) {
   return this.bonus_list.bonusEnabled(bonus_name);
 }
 
+
+
+
+
+
+
+
+
+
+
+///////////////////////////////////////////////////
+///////////           RIVER FUNCTIONS           /////
+////////////////////////////////////////////////////////
+
+function cutRiver(world, position) {
+  let tile = world.getTile(position);
+  let step_time = 300;
+
+  if (tile.onRiver()) {
+    var dam_level = tile.river.water_level;
+    cutRiverStep();
+  }
+
+  
+  function cutRiverStep() {   
+    
+    tile.river.water_level -= dam_level;
+    tile = world.getTile(tile.river.downstream_hex);
+
+    if (tile.river.downstream_hex)
+      setTimeout(cutRiverStep, step_time);
+  }
+
+}
+
+
+function hydroDam = function(world, target) {
+    
+    let tile = world.getTile(target);
+    if (world.getTile(target).river.upstream_hexes) {
+      for (upstream of world.getTile(target).river.upstream_hexes) {
+        if (world.getTile(upstream).river.water_level >= 7)
+          this.hydroDam(world, upstream);
+        //setTimeout(function(){ self.hydroDam(world, upstream); }, 200);
+      }
+      
+      //flood the tile
+      tile.elevation = 1;     
+      world.removeRoads(target);   
+      if (!world.noUnitTypeInArea(target, 0, 'colony')) {
+        world.getUnit(target).addPop(-1);
+        if (!world.getResource(target).resources['unknown'])
+          world.destroyResource(target);
+        world.destroyUnit(target);
+      }
+      if (Math.random() <= 0.2)
+        world.addResource(target, 'fish');
+
+
+    } else {
+      tile.elevation = 3+Math.floor(5*Math.random());
+    }
+
+
+}
