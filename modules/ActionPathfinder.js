@@ -5,7 +5,7 @@
                     // ACTION PATHFINDER SETTINGS //
   /////////////////////////////////////////////////////////
 
-import AsyncPathFinder from './u/AsyncPathFinder.js'
+import PathFinder from './u/PathFinder.js'
 
 
 export default function ActionPathfinder(action) {
@@ -13,7 +13,7 @@ export default function ActionPathfinder(action) {
 
 
   //create a pathfinder to explore the area around the unit
-  AsyncPathFinder.call(this, stepCostFunction, getNeighborsFunction, stopFunction);
+  PathFinder.call(this, stepCostFunction, getNeighborsFunction, stopFunction);
   this.action = action;
 
 

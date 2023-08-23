@@ -8,7 +8,7 @@ import Events from './Events.js'
 //Tracks the previous cell and total path cost
 //on 5e path.from the origin to cell
 //it take maps as arguments as returns maps
-export default function AsyncPathFinder(stepCostFunction, getNeighborFunction, stopFunction) {
+export default function PathFinder(stepCostFunction, getNeighborFunction, stopFunction) {
 
   //stepCostFunction must be          function(world, hex1, hex2)
   //getNeighborFunction must be       function(world, hex)
