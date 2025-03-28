@@ -23,7 +23,7 @@ This will eventually be communicated through the game interface.
 
 Seed action can launch to other planets. Zoom out a bit.
 
-Try and click the same tile a dozen times to see cool visuals.
+Try and click the same tile a few dozen times to see cool visuals.
 
 CREDITS
 All Hex code learned from RedBlogGames' great article on hex grids:
