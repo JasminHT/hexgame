@@ -6,23 +6,24 @@ Now also helping me learn to use Git better.
 The game will be self-explanatory later, for now you just have to know.
 
 How to play so far:
-# Settler
-* Blue and pink square is a settler.
-* Click him to select him.
-* Click inside his range to move.
-* Don't run out of food!
-* Put him on the yellow dots to get more food.
 
-# Towns
-* Click him again to turn into a town.
-* You need 10 wood to do so.
-* Put him on brown dots to get more food.
-* Towns can make settlers if they have 30 food.
-* Select them and click inside their range to do so.
-* Towns can grow bigger if they have 30 wood.
-* Select them and click them again to do so.
+Drag with the mouse or finger to move the screen.
+Use the scroll wheel or pinch to zoom.
 
 
+The numbered tile in the middle is your base.
+Click it once to show the range of movement (in brown).
+Hover your mouse within the range to see where you can place a node.
+Each node costs 2 dots, but gathers all dots in range.
+Click again on a node to grow its collection range.
+Nodes also expand your range.
+The central node shows your dot supply, try and increase it by placing nodes that gather more dots than they cost.
+
+This will eventually be communicated through the game interface.
+
+Seed action can launch to other planets. Zoom out a bit.
+
+Try and click a coastal tile many times to see cool visuals.
 
 CREDITS
 All Hex code learned from RedBlogGames' great article on hex grids:
