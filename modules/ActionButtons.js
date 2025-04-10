@@ -80,7 +80,8 @@ export default function ActionButtons(menu_name) {
       first_button.checked = true;
       let action = getActionFromId(actor, first_button.id);
 
-      //ASYNCHRONOUS PATHFINDING: launch a pathfinding mission, give it a callback to highlight tiles
+      //ASYNCHRONOUS PATHFINDING: 
+      //launch a pathfinding mission, give it a callback to highlight tiles
       action.highlightRangeAsync(world, position);
       
     }
@@ -196,7 +197,9 @@ export default function ActionButtons(menu_name) {
       html_menu.appendChild( html_button );
 
       //Add click listeners to each button (DOESNT)
-      html_button.addEventListener('click', () => {action.highlightRangeAsync(world, position)} );
+      html_button.addEventListener('click', () => {
+        action.highlightRangeAsync(world, position)
+      } );
       
       //Show action in grey if its requirement is not met
       if (!action.requirement(world, actor, position))

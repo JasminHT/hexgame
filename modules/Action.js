@@ -208,7 +208,7 @@ export default function Action() {
 
     
   }
-  //calls the callback whenever a new hex is added by the pathfinder
+  //sets a callback for when a new hex is added by the pathfinder
   this.getRangeAsync = function(world, position, callback) {
     
     if (this.infinite_range)
@@ -228,11 +228,11 @@ export default function Action() {
   this.highlightRangeAsync = function(world, position) {
 
     if (!this.pathfinder)
-      this.updatePathfinding(world, position);
+      this.pathfinder = new ActionPathfinder(this);
 
     let callback = function(hex) {world.tag(hex, 'brown');}
-
     this.getRangeAsync(world, position, callback);
+
     this.updatePathfinding(world, position);
   }
 
@@ -258,7 +258,7 @@ export default function Action() {
   this.getTargetsAsync = function(world,actor,origin,callback) {
 
     if (!this.pathfinder)
-      this.updatePathfinding(world, origin);
+      this.pathfinder = new ActionPathfinder(this);
 
     let self=this;
 
@@ -274,7 +274,7 @@ export default function Action() {
 
   this.getTargetsDynamic = function(world, actor, origin, callback) {
     if (!this.pathfinder)
-      this.updatePathfinding(world, hex);
+      this.pathfinder = new ActionPathfinder(this);
 
     let self=this;
 
@@ -289,7 +289,7 @@ export default function Action() {
 
   this.getTargetsDynamic2 = function(world, actor, origin, callback) {
     if (!this.pathfinder)
-      this.updatePathfinding(world, hex);
+      this.pathfinder = new ActionPathfinder(this);
 
     let self=this;
 
@@ -323,7 +323,6 @@ export default function Action() {
 
   //store an explored pathfinding map, can be reused as needed
   //ASYNCHRONOUS PATHFINDING: launch a pathfinding mission, which will be done in little steps
-  //can receive a callback function for the Pathfinding to call every so often
   this.updatePathfinding = function(world, origin) {
 
     if (!this.pathfinder)
