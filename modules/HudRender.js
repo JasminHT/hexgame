@@ -50,7 +50,7 @@ export default function HUDRender(world, world_input, render) {
       clearTimeout(hover_timeout);
     hover_timeout = setTimeout(function(){ updateActionTargets(world_hovered, hex_hovered);
                                                updateActionPath(world_hovered, hex_hovered); 
-                                               //updateTooltip(world, hex_hovered) 
+                                               updateTooltip(world_hovered, hex_hovered) 
                                              }, 20);
 
   }
