@@ -33,10 +33,12 @@ var canv_input = new CanvasInput('canvas');
 let earth_radius = 65;
 let earth_location = new Point(35*10*80, 0);
 var earth = new World( earth_radius, 'dust', earth_location, );
+earth.makeCloudsEverywhere();
 
 let mars_radius = 80;
 let mars_location = new Point(35*8*72+127, 0);
 var mars = new World( mars_radius,'earth', mars_location )
+
 
 let system_radius = 10;
 var system = new World(system_radius, 'system');
@@ -99,7 +101,7 @@ let start_point = earth.getPoint( start_hex.multiply(-1) );
 view.setCenter( start_point );
 
 //clear some clouds
-earth.clearClouds(start_hex, 3);
+earth.clearClouds(start_hex, 6);
 //mars.clearClouds(new Hex(0,0), 100)
 
 
