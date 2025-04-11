@@ -100,7 +100,7 @@ Unit.prototype.setType = function(unit_type) {
       this.pop =  1;
       this.setGraphic(city_color,4);
       this.can_move = true;
-      this.addAction( new actionExpand(10));
+      this.addAction( new actionExpand(6));
       this.addAction( new actionExpandByAir());
       this.addAction( new actionMove(10) );
       //this.addAction( new actionExpandAll() );
