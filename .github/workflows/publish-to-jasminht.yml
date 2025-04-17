@@ -54,4 +54,4 @@ jobs:
           remote-path: /GITUPLOAD/hexgame-test/deploy-test
 
           # Port for SFTP access to server
-          remote-port: 22
+          remote-port: 221
