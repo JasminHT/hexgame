@@ -51,7 +51,7 @@ jobs:
           remote-password: ${{ secrets.PASSWORD }}
 
           # Path for specific folder on server for files deployment
-          remote-path: /GITUPLOAD/hexgame-test/deploy-test
+          remote-path: GITUPLOAD
 
           # Port for SFTP access to server
-          remote-port: 221
+          remote-port: 22
