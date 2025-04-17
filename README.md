@@ -1,9 +1,9 @@
 A 4X game with no waiting. Closer to CivClicker than Civilization.
 
-Initially intended as a learning experiment for both HTML5 Canvas and Javascript.
-Now also helping me learn to use Git better.
+Initially intended as a learning experiment for HTML5 Canvas and Javascript.
+Now also helping me learn to use Github actions better.
 
-The game will be self-explanatory later, for now you just have to know.
+The game will have better onboarding later, for now you just have to know.
 
 How to play so far:
 
