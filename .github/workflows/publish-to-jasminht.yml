@@ -8,7 +8,7 @@ on:
   # Triggers the workflow on push request event 
   # but only for the specific branch
   push:
-    branches: [ github-actions-tutorial ]
+    branches: [ master ]
 
 # A workflow run is made up of one or more jobs 
 # that can run sequentially or in parallel
@@ -36,7 +36,7 @@ jobs:
           fetch-depth: 0
 
           # Checkout a specific branch
-          ref: github-actions-tutorial
+          ref: master
 
       # This is a composite GitHub Action (Linux runner) 
       # for deploying repository content to remote server
