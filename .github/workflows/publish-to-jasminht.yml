@@ -49,4 +49,4 @@ jobs:
             username: ${{ secrets.USERNAME }}
             password: ${{ secrets.PASSWORD }}
             sourceDir: .
-            targetDir: /home/jasht1/GITUPLOAD
+            targetDir: /home/jasht1/www/hexgame
