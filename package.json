@@ -1,0 +1,14 @@
+{
+  "name": "hexgame",
+  "version": "1.0.0",
+  "description": "A game I build to learn Javascript",
+  "main": "index.html",
+  "scripts": {
+    "test": "test"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "vitest": "^3.1.1"
+  }
+}
