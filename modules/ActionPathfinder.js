@@ -5,6 +5,10 @@
                     // ACTION PATHFINDER SETTINGS //
   /////////////////////////////////////////////////////////
 
+// This module defines how steps are calculated during pathfinding events
+// It is used by actions like moving, building roads, or expanding.
+
+
 import PathFinder from './u/PathFinder.js'
 
 
@@ -13,8 +17,13 @@ export default function ActionPathfinder(action) {
 
 
   //create a pathfinder to explore the area around the unit
+  //these three functions are defined at the bottom
   PathFinder.call(this, stepCostFunction, getNeighborsFunction, stopFunction);
   this.action = action;
+
+
+
+
 
 
   //NEIGHBORS FUNCTION (for pathfinder)
