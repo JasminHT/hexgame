@@ -4,11 +4,14 @@
   "description": "A game I build to learn Javascript",
   "main": "index.html",
   "scripts": {
-    "test": "test"
+    "test": "vitest"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "vitest": "^3.1.1"
   }
+
+
 }
+
