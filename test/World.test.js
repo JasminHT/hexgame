@@ -1,6 +1,10 @@
 
 import { expect, test } from 'vitest'
-import { World } from './World.js'
+import  World  from '../src/World.js'
+
+//Dependencies
+import Hex from '../src/u/Hex.js'
+import {Point, HexLayout, HexMap} from '../src/u/Hex.js'
 
 //create a world
 let earth_radius = 20;
