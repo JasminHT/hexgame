@@ -132,6 +132,9 @@ export default function TileRender(world, hex_render) {
       if (road_size > 8) 
         road_color = 'saddlebrown'; 
 
+      if (getTile(hex).onWater())
+        road_color = '#1b70c5';
+
       let line_width = Math.min(9+road_size*2, 35);
       hex_render.drawCenterLine(hex, to, line_width, road_color, 'half only');
     }
