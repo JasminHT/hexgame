@@ -39,6 +39,8 @@ HexRender.p.pointToHex = function(point) {
   return this.hexlayout.pointToHex(point);
 }
 
+const lerp = (a, b, amount) => (1 - amount) * a + amount * b;
+
 // RENDERING FUNCTIONS
 HexRender.p.drawCenterLine = function(hex1, hex2, width, line_color, option) {
   var style = new RenderStyle();
@@ -48,24 +50,32 @@ HexRender.p.drawCenterLine = function(hex1, hex2, width, line_color, option) {
   
   var p1 = this.hexToPoint(hex1);
   var p2 = this.hexToPoint(hex2);
+  var phalf = new Point( (p2.x+p1.x)/2 , (p2.y+p1.y)/2 );
+  var pover = new Point( lerp(p1.x,p2.x,0.51), lerp(p1.y,p2.y,0.51) );
 
   if (option=='half only') {
-    p2 = new Point( (p2.x+p1.x)/2 , (p2.y+p1.y)/2 );
-
+    this.render.drawLine(p1, p1, style);
+    style.line_caps = 'butt';
+    this.render.drawLine(p1, pover, style);
+    return;
   }
 
   if (option=='moving dots') {
-    p2 = new Point( (p2.x+p1.x)/2 , (p2.y+p1.y)/2 );
-    p1 = this.fractionalRandomPoint1(p1,p2);
+    p1 = this.fractionalRandomPoint1(p1,phalf);
     p2 = p1;
+    this.render.drawLine(p1,phalf, style);
+    return;
   }
 
   if (option=='moving dots backwards') {
-    p2 = new Point( (p2.x+p1.x)/2 , (p2.y+p1.y)/2 );
-    p1 = this.fractionalRandomPoint1(p2,p1);
+    p1 = this.fractionalRandomPoint1(phalf,p1);
     p2 = p1;
+    this.render.drawLine(p1,phalf, style);
+    return;
   }
 
+
+  style.line_caps = 'round';
   this.render.drawLine(p1,p2, style);
 
 }
