@@ -1,18 +1,18 @@
 //-------1----------2---------3---------4---------5---------6---------7--------8
 
-import CanvasDraw from './modules/u/CanvasDraw.js';
-import CanvasInput from './modules/u/CanvasInput.js';
-import Events from './modules/u/Events.js'
-import Hex from './modules/u/Hex.js'
-import View from './modules/View.js';
-import {Point} from './modules/u/Hex.js'
+import CanvasDraw from './src/u/CanvasDraw.js';
+import CanvasInput from './src/u/CanvasInput.js';
+import Events from './src/u/Events.js'
+import Hex from './src/u/Hex.js'
+import View from './src/View.js';
+import {Point} from './src/u/Hex.js'
 
 
-import GameRender from './modules/GameRender.js'
-import WorldInput from './modules/WorldInput.js';
-import World from './modules/World.js';
-import Unit from './modules/Unit.js'
-import ViewInput from './modules/ViewInput.js';
+import GameRender from './src/GameRender.js'
+import WorldInput from './src/WorldInput.js';
+import World from './src/World.js';
+import Unit from './src/Unit.js'
+import ViewInput from './src/ViewInput.js';
 
 
 //---------------HTML5 Canvas elements-----------
