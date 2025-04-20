@@ -52,7 +52,7 @@ export default function actionExpand(distance) {
   this.extra_description = "Click a brown tile to grow there";
 
   this.targetFilterFunction = function(world, actor, target) {
-    return true;//world.onLand(target);
+    return world.getTile(target).onLand();
   }
 
   this.preEffect = function(world, actor, position, target) {
@@ -69,7 +69,6 @@ export default function actionExpand(distance) {
     //Collect resources around new node
     if (world.unitAtLocation(target)) {
       let target_pop = world.getUnit(target).pop;
-      //TODO uncomment
       this.after_action = new actionGrowRoots( target_pop );
       this.after_action.actor = this.actor;
     }
@@ -103,7 +102,7 @@ export function actionGrowRoots(max_distance) {
   this.can_use_roads = false;
   this.double_road_speed = false;
 
-  this.collect_resource = true; //should be true but 'takes city pop' relies on cost
+  this.collect_resource = true;
   this.destroy_resource = true;
 
   this.multi_target = true;

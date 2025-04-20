@@ -11,7 +11,8 @@ import {Point} from './src/u/Hex.js'
 import GameRender from './src/GameRender.js'
 import WorldInput from './src/WorldInput.js';
 import World from './src/World.js';
-import Unit from './src/Unit.js'
+import Unit from './src/Unit.js';
+import Score from './src/Score.js';
 import ViewInput from './src/ViewInput.js';
 
 
@@ -28,7 +29,9 @@ var canv_input = new CanvasInput('canvas');
 
 
 //-------------Game-specific elements------------
+
 //Contains a world map, units, and resources
+let score = new Score(0);
 
 let earth_radius = 65;
 let earth_location = new Point(35*10*80, 0);

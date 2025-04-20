@@ -9,6 +9,7 @@
 import ActionPathfinder from './ActionPathfinder.js'
 import Hex from './u/Hex.js'
 import {listContainsHex} from './u/Hex.js'
+import Events from './u/Events.js'
 
 //All actions inherit from this action
 export default function Action() {
@@ -158,6 +159,7 @@ export default function Action() {
       if (world.hasResource(target)) {
         this.actor.addPop(1);
         world.tag(target, 'green');
+        Events.emit('score_increase', {points: 1} );
       }
     }
 
@@ -173,8 +175,9 @@ export default function Action() {
 
     //this appears twice
     if (this.collect_resource ) 
-      if (world.hasResource(target)) 
+      if (world.hasResource(target)) {
         world.getUnit(position).addPop(1);
+      }
 
     if (this.transfer_pop)
       if (world.getUnit(target) && world.getUnit(target).pop) {
