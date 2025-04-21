@@ -4,16 +4,12 @@
 
 import Events from './u/Events.js'
 
-function clearScore() {
-  document.getElementById('score').innerHTML = "";
+function setScore(to) {
+  document.getElementById('score').innerHTML = to;
 }
 
-function getScore() {
-  return document.getElementById('score').innerHTML;
-}
-
-function addScore(message) {
-  document.getElementById('score').innerHTML += message;
+function setProfit(to) {
+  document.getElementById('profit').innerHTML = to;
 }
 
 export default function Score(init) {
@@ -23,8 +19,11 @@ export default function Score(init) {
 
   Events.on('score_increase', (event) => { 
     self.total += event.detail.points;
-    clearScore();
-    addScore(self.total);
+    setScore(self.total);
+   });
+
+  Events.on('set_profit', (event) => { 
+    setProfit(event.detail.profit);
    });
 
 }
