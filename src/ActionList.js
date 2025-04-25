@@ -72,6 +72,7 @@ export default function actionExpand(distance) {
       this.after_action = new actionGrowRoots( target_pop );
       this.after_action.actor = this.actor;
     }
+    world.clearClouds(target,5); 
   }
 }
 
