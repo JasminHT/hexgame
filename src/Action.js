@@ -159,7 +159,6 @@ export default function Action() {
       if (world.hasResource(target)) {
         this.actor.addPop(1);
         console.log(this.actor);
-        Events.emit('set_profit', {profit: this.actor.pop} );
         world.tag(target, 'green');
         Events.emit('score_increase', {points: 1} );
       }
@@ -187,6 +186,8 @@ export default function Action() {
         this.actor.addPop(world.getUnit(target).pop);
         world.getUnit(target).pop = 0;
       }
+
+    Events.emit('set_profit', {profit: this.actor.pop} );
 
 
 
