@@ -86,9 +86,8 @@ export default function HUDRender(world, world_input, render) {
 
       //ASYNCHRONOUS PATHFINDING: launch a pathfinding mission, and over time store results in "action_targets"
       //pass in a callback so the PathFinder can send results back every so often?
-      if (action.hover_action) {
-        let hover_action = action.hover_action;
-
+      let hover_action = action.hover_action;
+      if (hover_action) {
         //returns a "dynamic array" that changes over time as the pathfinder progresses
         action_targets = [];
         hover_action.initialize(world_hovered, hex_hovered);

@@ -61,6 +61,10 @@ export default function actionExpand(distance) {
     if (world.unitAtLocation(target) && world.getUnit(target).pop /*&& world.getUnit(target).pop < 11*/) {
       world.getUnit(target).pop++;
     }
+
+    //Clicking on a resource: capture it directly
+    if ( world.hasResource(target) ) 
+      this.new_unit_type = "village";
   }
 
 
@@ -73,6 +77,7 @@ export default function actionExpand(distance) {
       this.after_action.actor = this.actor;
     }
     world.clearClouds(target,5); 
+    this.new_unit_type = "city"; //revert to normal
   }
 }
 
@@ -125,7 +130,6 @@ export function actionGrowRoots(max_distance) {
 
 
   this.effect = function(world,actor,position,target) {
-    //actor.addPop(1);
     world.createUnit(target, 'village');
     for (let hex of Hex.circle(target, 2))
       world.tag(hex, 'green');

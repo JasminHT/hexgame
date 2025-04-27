@@ -279,7 +279,7 @@ export default function Action() {
 
   }
 
-  this.getTargetsDynamic = function(world, actor, origin, callback) {
+  this. getTargetsDynamic= function(world, actor, origin, callback) {
     if (!this.pathfinder)
       this.pathfinder = new ActionPathfinder(this);
 
