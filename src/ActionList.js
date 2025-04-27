@@ -100,7 +100,7 @@ export function actionGrowRoots(max_distance) {
   this.coastal_start = true;
 
   this.also_build_road = true;
-  this.can_use_roads = false;
+  this.can_use_roads = true;
   this.double_road_speed = false;
 
   this.collect_resource = true;

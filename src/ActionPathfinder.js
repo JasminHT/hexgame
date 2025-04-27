@@ -16,34 +16,19 @@ export default function ActionPathfinder(action) {
 
 
 
-  //create a pathfinder to explore the area around the unit
-  //these three functions are defined at the bottom
+  //create a generic pathfinder to explore the area around the unit
+  //the three callback functions are defined at the bottom
   PathFinder.call(this, stepCostFunction, getNeighborsFunction, stopFunction);
   this.action = action;
 
 
 
-
-
-
-  //NEIGHBORS FUNCTION (for pathfinder)
+  
   function getNeighborsFunction(world, hex) {
     return world.getNeighbors(hex);
   }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+  
   //The StopFunction determines which steps makes the pathfinding end, for example embarking into water
   //It does not determine which steps are IMPOSSIBLE, those are determined in the step cost function
   function stopFunction(world, hex, next_hex, origins = null) {
@@ -87,23 +72,7 @@ export default function ActionPathfinder(action) {
   }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  //STEP COST FUNCTION (for pathfinder)
+  //The step cost function determines the cost of each step, and if the step is possible or not
   function stepCostFunction(world, hex, next_hex, origins) {
     var next_tile = world.getTile(next_hex);
     var this_tile = world.getTile(hex);
@@ -114,8 +83,7 @@ export default function ActionPathfinder(action) {
       return 1;
     }
 
-    // COST IS UNDEFINED FOR THE FOLLOWING IMPOSSIBLE ACTIONS:
-
+    // When cost is undefined, it means the step cannot be done
     if (!next_tile || !this_tile)
       return undefined;
 
@@ -168,7 +136,7 @@ export default function ActionPathfinder(action) {
           return undefined;
       }
 
-      //coastal starts cannot enter water except from their start position
+      //coastal starts can only enter water from their start position
       if ( action.coastal_start && !action.embark_at_cities) {
         for (let origin of origins) {
           if (hex.equals(origin))
@@ -216,9 +184,11 @@ export default function ActionPathfinder(action) {
       else
         cost = 1;
 
-    if ((this_tile.roadConnected(next_tile) && (action.can_use_roads) ))
+    if ((this_tile.roadConnected(next_tile) && (action.can_use_roads) )) {
+      cost = 0.9;
       if (action.double_road_speed )
         cost = 0.01;
+    }
 
 
 
