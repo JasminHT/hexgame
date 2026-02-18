@@ -1,5 +1,5 @@
 
-import Hex from './u/Hex.js'
+import Hex from './u/Hex.js' 
 import Action from './Action.js'
 
 //this function is currently set out to be an all-encompassing action that can 
@@ -10,7 +10,7 @@ import Action from './Action.js'
 export default function actionExpand(distance) {
   Action.call(this);
 
-  this.name = "city-by-land-2";
+  this.name = "city-by-land-2";;
   this.cost = 2;
   this.takes_city_pop = true;
 
